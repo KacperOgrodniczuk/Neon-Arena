@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 399002485472857927}
   - component: {fileID: 1304723258751935421}
   - component: {fileID: 7569453359119389288}
+  - component: {fileID: 1153302781792120031}
   - component: {fileID: 42141218049475013}
   m_Layer: 0
   m_Name: Cube Projectile
@@ -112,6 +113,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &1153302781792120031
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6932953689017160146}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!114 &42141218049475013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,3 +152,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a6e1f9d22447a24a9943321d287049e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
+  speed: 20
+  damage: 10

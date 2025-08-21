@@ -2,23 +2,26 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerLocmotionManager : MonoBehaviour
+public class PlayerLocomotionManager : MonoBehaviour
 {
-    private CharacterController characterController;
+    private PlayerManager playerManager;
+    public CharacterController characterController { get; private set; }
 
     [Header("Input Values")]
     private float horizontalInput;
     private float verticalInput;
+    public float moveAmount { get; private set; }
     Vector3 targetRotationDirection;
     Vector3 moveDirection;
 
     [Header("Speed Values")]
-    public float moveSpeed = 6f;
+    public float moveSpeed = 4f;
     public float gravity = -10f;
     public float rotationSpeed = 15f;
 
     private void Awake()
     {
+        playerManager = GetComponent<PlayerManager>();
         characterController = GetComponent<CharacterController>();
     }
 
@@ -34,6 +37,16 @@ public class PlayerLocmotionManager : MonoBehaviour
     {
         horizontalInput = PlayerInputManager.Instance.movementInput.x;
         verticalInput = PlayerInputManager.Instance.movementInput.y;
+        moveAmount = moveAmount = Mathf.Clamp01(Mathf.Abs(horizontalInput) + Mathf.Abs(verticalInput));
+
+        if (moveAmount > 0f && moveAmount <= 0.5f)
+        {
+            moveAmount = 0.5f;
+        }
+        else if (moveAmount > 0.5f && moveAmount <= 1f)
+        {
+            moveAmount = 1f;
+        }
     }
 
     void HandleGroundMovement()

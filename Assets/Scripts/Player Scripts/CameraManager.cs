@@ -109,4 +109,24 @@ public class CameraManager : MonoBehaviour
         cameraObjectPosition.z = Mathf.Lerp(cameraObject.transform.localPosition.z, targetCameraZPosition, 0.2f);
         cameraObject.transform.localPosition = cameraObjectPosition;
     }
+
+    public Vector3 GetAimTargetPoint()
+    {
+        Ray ray = cameraObject.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+
+        Vector3 targetPoint;
+
+        if (Physics.Raycast(ray, out hit, 100f)) // 100 units max
+        {
+            targetPoint = hit.point;
+        }
+        else
+        {
+            // if nothing hit, aim at some point far away along the ray
+            targetPoint = ray.origin + ray.direction * 100f;
+        }
+
+        return targetPoint;
+    }
 }

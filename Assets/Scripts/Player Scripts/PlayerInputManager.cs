@@ -12,6 +12,9 @@ public class PlayerInputManager : MonoBehaviour
     [Header("Look")]
     public Vector2 lookInput;
 
+    [Header("Actions")]
+    public bool attackInput;
+
     private void Awake()
     {
         if (Instance == null)
@@ -32,6 +35,7 @@ public class PlayerInputManager : MonoBehaviour
         //register callbacks
         inputActions.Player.Move.performed += context => movementInput = context.ReadValue<Vector2>();
         inputActions.Player.Look.performed += context => lookInput = context.ReadValue<Vector2>();
+        inputActions.Player.Attack.performed += context => attackInput = context.ReadValueAsButton();
 
         LockCursor();
     }
