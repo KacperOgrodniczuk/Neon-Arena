@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7569453359119389288}
   - component: {fileID: 1153302781792120031}
   - component: {fileID: 42141218049475013}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -139,7 +139,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &42141218049475013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,3 +154,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   speed: 20
   damage: 10
+  owner: {fileID: 0}

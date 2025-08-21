@@ -13,6 +13,7 @@ public class CameraManager : MonoBehaviour
     public float minimumPivot = -89f;
     public float maximumPivot = 89f;
     public LayerMask cameraCollisionLayers;
+    public LayerMask aimCollisionLayers;
 
     [Header("Camera Values")]
     Vector3 cameraVelocity;

@@ -8,8 +8,9 @@ public class PlayerShootingManager : MonoBehaviour
     public GameObject projectilePrefab;
 
     [Header("Attack Stats")]
-    public float projectileSpeed = 20f;
+    public float fireRate = 0.33f;
     public float projectileDamage = 10f;
+    public float projectileSpeed = 20f;
 
     private void Awake()
     {

@@ -145,7 +145,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d76b6c1e96d674045b0e138c69b59aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShootingManager
-  projectileSpawn: {fileID: 0}
+  projectileSpawn: {fileID: 7077436915817607732}
+  projectilePrefab: {fileID: 6932953689017160146, guid: 0d577d3efbf064847a1ddd9d5766fe64, type: 3}
+  projectileSpeed: 20
+  projectileDamage: 10
 --- !u!1 &8709443052471894445
 GameObject:
   m_ObjectHideFlags: 0

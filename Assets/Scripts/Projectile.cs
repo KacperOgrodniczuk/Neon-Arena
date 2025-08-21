@@ -30,16 +30,6 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Projectile otherProjectile = collision.gameObject.GetComponent<Projectile>();
-
-        //projectiles should not collide with other projectiles with the same owner
-        if (otherProjectile != null && otherProjectile.owner == owner)
-        {
-            Physics.IgnoreCollision(collider, collision.collider);
-            return;
-        }
-
-
         Destroy(gameObject);
     }
 }
