@@ -118,7 +118,7 @@ public class CameraManager : MonoBehaviour
 
         Vector3 targetPoint;
 
-        if (Physics.Raycast(ray, out hit, 100f)) // 100 units max
+        if (Physics.Raycast(ray, out hit, 100f, aimCollisionLayers)) // 100 units max
         {
             targetPoint = hit.point;
         }

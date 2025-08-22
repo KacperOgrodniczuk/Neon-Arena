@@ -15,6 +15,7 @@ public class PlayerInputManager : MonoBehaviour
     [Header("Actions")]
     public bool attackInput;
     public bool aimInput;
+    public bool sprintInput;
 
     private void Awake()
     {
@@ -38,6 +39,7 @@ public class PlayerInputManager : MonoBehaviour
         inputActions.Player.Look.performed += context => lookInput = context.ReadValue<Vector2>();
         inputActions.Player.Attack.performed += context => attackInput = context.ReadValueAsButton();
         inputActions.Player.Aim.performed += context => aimInput = context.ReadValueAsButton();
+        inputActions.Player.Sprint.performed += context => sprintInput = context.ReadValueAsButton();
 
         LockCursor();
     }

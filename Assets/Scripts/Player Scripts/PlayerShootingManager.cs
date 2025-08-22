@@ -27,6 +27,10 @@ public class PlayerShootingManager : MonoBehaviour
 
     void HandleShooting()
     {
+        // Can only shoot if aiming
+        if (!playerManager.isAiming)
+            return;
+
         if (PlayerInputManager.Instance.attackInput && Time.time >= nextShootTime)
         {
             Vector3 targetPoint = CameraManager.Instance.GetAimTargetPoint();
@@ -35,9 +39,9 @@ public class PlayerShootingManager : MonoBehaviour
             Projectile projectile = Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity).GetComponent<Projectile>();
             projectile.owner = gameObject;
             projectile.ShootProjectile(targetDirection, projectileSpeed, projectileDamage);
-            
+
             Physics.IgnoreCollision(playerManager.GetComponent<Collider>(), projectile.GetComponent<Collider>());
-        
+
             nextShootTime = Time.time + fireRate;
         }
     }

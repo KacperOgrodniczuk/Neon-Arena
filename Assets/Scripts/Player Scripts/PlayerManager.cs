@@ -8,6 +8,7 @@ public class PlayerManager : MonoBehaviour
 
     [Header("Flags")]
     public bool isAiming;
+    public bool isSprinting;
 
     private void Awake()
     {

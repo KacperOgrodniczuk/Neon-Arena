@@ -6,7 +6,7 @@ public class PlayerAnimationManager : MonoBehaviour
 {
     public Animator animator { get; private set; }
 
-    float dampTime = 0.1f;
+    float dampTime = 0.15f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()

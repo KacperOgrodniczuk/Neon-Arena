@@ -10,6 +10,7 @@ public class PlayerLocomotionManager : MonoBehaviour
     [Header("Input Values")]
     public float horizontalInput { get; private set; }
     public float verticalInput {get; private set;}
+    private bool sprintInput;
     private bool isAiming;
 
     public float moveAmount { get; private set; }
@@ -17,9 +18,12 @@ public class PlayerLocomotionManager : MonoBehaviour
     Vector3 moveDirection;
 
     [Header("Speed Values")]
-    public float moveSpeed = 4f;
+    public float walkSpeed = 2f;
+    public float runSpeed = 4f;
+    public float sprintSpeed = 6f;
     public float gravity = -10f;
     public float rotationSpeed = 15f;
+    private float currentMoveSpeed;
 
     private void Awake()
     {
@@ -30,7 +34,7 @@ public class PlayerLocomotionManager : MonoBehaviour
     private void Update()
     {
         GetInputValues();
-
+        DetermineSpeed();
         HandleGroundMovement();
         HandleRotation();
     }
@@ -39,18 +43,27 @@ public class PlayerLocomotionManager : MonoBehaviour
     {
         horizontalInput = PlayerInputManager.Instance.movementInput.x;
         verticalInput = PlayerInputManager.Instance.movementInput.y;
-        moveAmount = moveAmount = Mathf.Clamp01(Mathf.Abs(horizontalInput) + Mathf.Abs(verticalInput));
+        sprintInput = PlayerInputManager.Instance.sprintInput;
+        isAiming = playerManager.isAiming;
+
+        moveAmount = Mathf.Clamp01(Mathf.Abs(horizontalInput) + Mathf.Abs(verticalInput));
 
         if (moveAmount > 0f && moveAmount <= 0.5f)
-        {
             moveAmount = 0.5f;
-        }
         else if (moveAmount > 0.5f && moveAmount <= 1f)
-        {
             moveAmount = 1f;
+        
+        if (sprintInput && moveAmount > 0.1f)
+        {
+            moveAmount = 2f;
+            
+            // Clamped for animations.
+            verticalInput = Mathf.Clamp(verticalInput * moveAmount, -1f, 2f);
+            
+            // Scale horizontally only if not moving backwards.
+            if(verticalInput >= 0f)
+                horizontalInput *= moveAmount;
         }
-
-        isAiming = playerManager.isAiming;
     }
 
     void HandleGroundMovement()
@@ -68,7 +81,7 @@ public class PlayerLocomotionManager : MonoBehaviour
         moveDirection += cameraRight * horizontalInput;
         moveDirection.Normalize();
 
-        characterController.Move(Time.deltaTime * moveSpeed * moveDirection);
+        characterController.Move(Time.deltaTime * currentMoveSpeed * moveDirection);
     }
 
     void HandleRotation()
@@ -106,5 +119,17 @@ public class PlayerLocomotionManager : MonoBehaviour
             Quaternion targetRotation = Quaternion.Slerp(transform.rotation, newRotation, rotationSpeed * Time.deltaTime);
             transform.rotation = targetRotation;
         }
+    }
+
+    void DetermineSpeed()
+    {
+        if (sprintInput && (!isAiming || verticalInput >= 0f))
+            currentMoveSpeed = sprintSpeed;
+        else if (moveAmount == 1f)
+            currentMoveSpeed = runSpeed;
+        else if (moveAmount == 0.5f)
+            currentMoveSpeed = walkSpeed;
+
+        playerManager.isSprinting = currentMoveSpeed == sprintSpeed;
     }
 }
