@@ -8,8 +8,10 @@ public class PlayerLocomotionManager : MonoBehaviour
     public CharacterController characterController { get; private set; }
 
     [Header("Input Values")]
-    private float horizontalInput;
-    private float verticalInput;
+    public float horizontalInput { get; private set; }
+    public float verticalInput {get; private set;}
+    private bool isAiming;
+
     public float moveAmount { get; private set; }
     Vector3 targetRotationDirection;
     Vector3 moveDirection;
@@ -47,6 +49,8 @@ public class PlayerLocomotionManager : MonoBehaviour
         {
             moveAmount = 1f;
         }
+
+        isAiming = playerManager.isAiming;
     }
 
     void HandleGroundMovement()
@@ -69,26 +73,38 @@ public class PlayerLocomotionManager : MonoBehaviour
 
     void HandleRotation()
     {
-        Vector3 cameraForward = CameraManager.Instance.transform.forward;
-        Vector3 cameraRight = CameraManager.Instance.transform.right;
-
-        cameraForward.y = 0;
-        cameraRight.y = 0;
-        cameraForward.Normalize();
-        cameraRight.Normalize();
-
-        targetRotationDirection = Vector3.zero;
-        targetRotationDirection = cameraForward * verticalInput;
-        targetRotationDirection += cameraRight * horizontalInput;
-        targetRotationDirection.y = 0f;
-
-        if (targetRotationDirection == Vector3.zero)
+        if (isAiming)
         {
-            targetRotationDirection = transform.forward;
-        }
+            Vector3 cameraForward = CameraManager.Instance.transform.forward;
+            cameraForward.y = 0;
+            cameraForward.Normalize();
 
-        Quaternion newRotation = Quaternion.LookRotation(targetRotationDirection);
-        Quaternion targetRotation = Quaternion.Slerp(transform.rotation, newRotation, rotationSpeed * Time.deltaTime);
-        transform.rotation = targetRotation;
+            Quaternion newRotation = Quaternion.LookRotation(cameraForward);
+            Quaternion targetRotation = Quaternion.Slerp(transform.rotation, newRotation, rotationSpeed * Time.deltaTime);
+            transform.rotation = targetRotation;
+        }
+        else
+        {
+            Vector3 cameraForward = CameraManager.Instance.transform.forward;
+            Vector3 cameraRight = CameraManager.Instance.transform.right;
+            cameraForward.y = 0;
+            cameraRight.y = 0;
+            cameraForward.Normalize();
+            cameraRight.Normalize();
+
+            targetRotationDirection = Vector3.zero;
+            targetRotationDirection = cameraForward * verticalInput;
+            targetRotationDirection += cameraRight * horizontalInput;
+            targetRotationDirection.y = 0f;
+
+            if (targetRotationDirection == Vector3.zero)
+            {
+                targetRotationDirection = transform.forward;
+            }
+
+            Quaternion newRotation = Quaternion.LookRotation(targetRotationDirection);
+            Quaternion targetRotation = Quaternion.Slerp(transform.rotation, newRotation, rotationSpeed * Time.deltaTime);
+            transform.rotation = targetRotation;
+        }
     }
 }

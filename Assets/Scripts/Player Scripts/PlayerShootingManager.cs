@@ -12,6 +12,8 @@ public class PlayerShootingManager : MonoBehaviour
     public float projectileDamage = 10f;
     public float projectileSpeed = 20f;
 
+    private float nextShootTime;
+
     private void Awake()
     {
         playerManager = GetComponent<PlayerManager>();
@@ -20,11 +22,12 @@ public class PlayerShootingManager : MonoBehaviour
     private void Update()
     {
         HandleShooting();
+        HandleAiming();
     }
 
     void HandleShooting()
     {
-        if (PlayerInputManager.Instance.attackInput)
+        if (PlayerInputManager.Instance.attackInput && Time.time >= nextShootTime)
         {
             Vector3 targetPoint = CameraManager.Instance.GetAimTargetPoint();
             Vector3 targetDirection = (targetPoint - projectileSpawn.position).normalized;
@@ -34,6 +37,13 @@ public class PlayerShootingManager : MonoBehaviour
             projectile.ShootProjectile(targetDirection, projectileSpeed, projectileDamage);
             
             Physics.IgnoreCollision(playerManager.GetComponent<Collider>(), projectile.GetComponent<Collider>());
+        
+            nextShootTime = Time.time + fireRate;
         }
+    }
+
+    void HandleAiming()
+    {
+        playerManager.isAiming = PlayerInputManager.Instance.aimInput;
     }
 }

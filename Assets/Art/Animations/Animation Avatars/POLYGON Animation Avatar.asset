@@ -6,7 +6,7 @@ Avatar:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Player Animation Avatar
+  m_Name: POLYGON Animation Avatar
   m_AvatarSize: 13664
   m_Avatar:
     serializedVersion: 3

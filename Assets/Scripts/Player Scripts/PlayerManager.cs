@@ -6,6 +6,9 @@ public class PlayerManager : MonoBehaviour
     public PlayerLocomotionManager locomotionManager { get; private set; }
     public PlayerAnimationManager animationManager { get; private set; }
 
+    [Header("Flags")]
+    public bool isAiming;
+
     private void Awake()
     {
         locomotionManager = GetComponent<PlayerLocomotionManager>();
@@ -14,9 +17,15 @@ public class PlayerManager : MonoBehaviour
 
     private void Update()
     {
-        //if aiming pass both parameters
-
-        //if not aiming pass one parameter since the player rotates in the direction they move in.
-        animationManager.UpdateMovementParameters(0, locomotionManager.moveAmount);
+        if (isAiming)
+        {
+            //if aiming pass both parameters
+            animationManager.UpdateMovementParameters(locomotionManager.horizontalInput, locomotionManager.verticalInput);
+        }
+        else
+        {
+            //if not aiming pass one parameter since the player rotates in the direction they move in.
+            animationManager.UpdateMovementParameters(0, locomotionManager.moveAmount);
+        }
     }
 }
