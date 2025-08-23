@@ -1,12 +1,12 @@
+using FishNet.Object;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
-public class Projectile : MonoBehaviour
+public class Projectile : NetworkBehaviour
 {
     public float speed = 20f;
     public float damage = 10f;
-    float lifetime = 10f;
 
     new Rigidbody rigidbody;
     new Collider collider;
@@ -16,8 +16,6 @@ public class Projectile : MonoBehaviour
     {
         rigidbody = GetComponent<Rigidbody>();
         collider = GetComponent<Collider>();
-
-        Destroy(gameObject, lifetime);
     }
 
     public void ShootProjectile(Vector3 direction, float speed, float damage)
@@ -30,6 +28,9 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Destroy(gameObject);
+        if (IsServerInitialized)
+        {
+            Despawn(gameObject);
+        }
     }
 }

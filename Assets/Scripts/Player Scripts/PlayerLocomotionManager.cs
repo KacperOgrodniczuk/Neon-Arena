@@ -1,8 +1,8 @@
+using FishNet.Object;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerLocomotionManager : MonoBehaviour
+public class PlayerLocomotionManager : NetworkBehaviour
 {
     private PlayerManager playerManager;
     public CharacterController characterController { get; private set; }
@@ -33,6 +33,8 @@ public class PlayerLocomotionManager : MonoBehaviour
 
     private void Update()
     {
+        if (!IsOwner) return;
+
         GetInputValues();
         DetermineSpeed();
         HandleGroundMovement();

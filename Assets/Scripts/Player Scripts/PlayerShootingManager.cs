@@ -1,11 +1,12 @@
+using FishNet.Object;
 using UnityEngine;
 
-public class PlayerShootingManager : MonoBehaviour
+public class PlayerShootingManager : NetworkBehaviour
 {
     private PlayerManager playerManager;
 
     public Transform projectileSpawn;
-    public GameObject projectilePrefab;
+    public NetworkObject projectilePrefab;
 
     [Header("Attack Stats")]
     public float fireRate = 0.33f;
@@ -21,6 +22,8 @@ public class PlayerShootingManager : MonoBehaviour
 
     private void Update()
     {
+        if (!IsOwner) return;
+
         HandleShooting();
         HandleAiming();
     }
@@ -36,14 +39,22 @@ public class PlayerShootingManager : MonoBehaviour
             Vector3 targetPoint = CameraManager.Instance.GetAimTargetPoint();
             Vector3 targetDirection = (targetPoint - projectileSpawn.position).normalized;
 
-            Projectile projectile = Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity).GetComponent<Projectile>();
-            projectile.owner = gameObject;
-            projectile.ShootProjectile(targetDirection, projectileSpeed, projectileDamage);
-
-            Physics.IgnoreCollision(playerManager.GetComponent<Collider>(), projectile.GetComponent<Collider>());
+            SpawnProjectile(targetDirection);
 
             nextShootTime = Time.time + fireRate;
         }
+    }
+
+    [ServerRpc]
+    void SpawnProjectile(Vector3 shootDirection)
+    {
+        NetworkObject projectileObject = Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity);
+        Projectile projectile = projectileObject.GetComponent<Projectile>();
+        projectile.owner = gameObject;
+        projectile.ShootProjectile(shootDirection, projectileSpeed, projectileDamage);
+        Spawn(projectileObject);
+
+        Physics.IgnoreCollision(playerManager.GetComponent<Collider>(), projectile.GetComponent<Collider>());
     }
 
     void HandleAiming()
