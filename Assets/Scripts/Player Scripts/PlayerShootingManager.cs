@@ -39,22 +39,32 @@ public class PlayerShootingManager : NetworkBehaviour
             Vector3 targetPoint = CameraManager.Instance.GetAimTargetPoint();
             Vector3 targetDirection = (targetPoint - projectileSpawn.position).normalized;
 
-            SpawnProjectile(targetDirection);
+            SpawnProjectileServerRpc(targetDirection);
 
             nextShootTime = Time.time + fireRate;
         }
     }
 
     [ServerRpc]
-    void SpawnProjectile(Vector3 shootDirection)
+    void SpawnProjectileServerRpc(Vector3 shootDirection)
     {
         NetworkObject projectileObject = Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity);
         Projectile projectile = projectileObject.GetComponent<Projectile>();
-        projectile.owner = gameObject;
-        projectile.ShootProjectile(shootDirection, projectileSpeed, projectileDamage);
-        Spawn(projectileObject);
+
+        projectile.ShootProjectile(shootDirection, projectileSpeed, projectileDamage, gameObject);
 
         Physics.IgnoreCollision(playerManager.GetComponent<Collider>(), projectile.GetComponent<Collider>());
+
+        Spawn(projectileObject);
+
+        SpawnProjectileClientRpc(projectileObject, shootDirection);
+    }
+
+    [ObserversRpc]
+    void SpawnProjectileClientRpc(NetworkObject projectileObject, Vector3 direction)
+    {
+        Projectile projectile = projectileObject.GetComponent<Projectile>();
+        projectile.SimulateLocally(direction, projectileSpeed);
     }
 
     void HandleAiming()

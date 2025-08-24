@@ -18,19 +18,28 @@ public class Projectile : NetworkBehaviour
         collider = GetComponent<Collider>();
     }
 
-    public void ShootProjectile(Vector3 direction, float speed, float damage)
-    { 
+    public void ShootProjectile(Vector3 direction, float speed, float damage, GameObject owner)
+    {
         this.speed = speed;
         this.damage = damage;
+        this.owner = owner;
 
+        rigidbody.linearVelocity = direction * speed;
+    }
+
+    // Called on clients (via ObserversRpc)
+    public void SimulateLocally(Vector3 direction, float speed)
+    {
+        if (IsServerInitialized) return; // server already set physics
+        rigidbody.isKinematic = false; // allow local movement
         rigidbody.linearVelocity = direction * speed;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (IsServerInitialized)
-        {
-            Despawn(gameObject);
-        }
+        if (!IsServerInitialized) return;
+
+        Despawn(gameObject);
     }
+
 }
