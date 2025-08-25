@@ -1,4 +1,6 @@
 using FishNet.Object;
+using System.Diagnostics;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlayerShootingManager : NetworkBehaviour
@@ -6,7 +8,7 @@ public class PlayerShootingManager : NetworkBehaviour
     private PlayerManager playerManager;
 
     public Transform projectileSpawn;
-    public NetworkObject projectilePrefab;
+    public GameObject projectilePrefab;
 
     [Header("Attack Stats")]
     public float fireRate = 0.33f;
@@ -14,6 +16,7 @@ public class PlayerShootingManager : NetworkBehaviour
     public float projectileSpeed = 20f;
 
     private float nextShootTime;
+    private const float maxPassedTime = 0.3f;
 
     private void Awake()
     {
@@ -39,32 +42,40 @@ public class PlayerShootingManager : NetworkBehaviour
             Vector3 targetPoint = CameraManager.Instance.GetAimTargetPoint();
             Vector3 targetDirection = (targetPoint - projectileSpawn.position).normalized;
 
-            SpawnProjectileServerRpc(targetDirection);
+            // Tell the server to spawn projectiles on other machines.
+            SpawnServerProjectile(projectileSpawn.position, targetDirection, base.TimeManager.Tick);
 
             nextShootTime = Time.time + fireRate;
         }
     }
 
-    [ServerRpc]
-    void SpawnProjectileServerRpc(Vector3 shootDirection)
+    // Spawn projectile Locally
+    void SpawnLocalProjectile(Vector3 startPosition, Vector3 shootDirection, float passedTime)
     {
-        NetworkObject projectileObject = Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity);
-        Projectile projectile = projectileObject.GetComponent<Projectile>();
-
-        projectile.ShootProjectile(shootDirection, projectileSpeed, projectileDamage, gameObject);
-
-        Physics.IgnoreCollision(playerManager.GetComponent<Collider>(), projectile.GetComponent<Collider>());
-
-        Spawn(projectileObject);
-
-        SpawnProjectileClientRpc(projectileObject, shootDirection);
+        GameObject localProjectile = Instantiate(projectilePrefab.gameObject, projectileSpawn.position, Quaternion.identity);
+        localProjectile.GetComponent<Projectile>().ShootProjectile(shootDirection, projectileSpeed, projectileDamage);
     }
 
-    [ObserversRpc]
-    void SpawnProjectileClientRpc(NetworkObject projectileObject, Vector3 direction)
+    // Client sending code to run on the server
+    [ServerRpc]
+    void SpawnServerProjectile(Vector3 startPosition, Vector3 shootDirection, uint tick)
     {
-        Projectile projectile = projectileObject.GetComponent<Projectile>();
-        projectile.SimulateLocally(direction, projectileSpeed);
+        float passedTime = (float)base.TimeManager.TimePassed(tick, false);
+
+        passedTime = Mathf.Min(maxPassedTime / 2f, passedTime);
+
+        // Tell other clients to spawn the projectil. 
+        SpawnObserversProjectile(startPosition, shootDirection, tick);
+    }
+
+    // Server sending code to run on clients
+    [ObserversRpc]
+    void SpawnObserversProjectile(Vector3 startPosition, Vector3 shootDirection, uint tick)
+    {
+        float passedTime = (float)base.TimeManager.TimePassed(tick, false);
+        passedTime = Mathf.Min(maxPassedTime, passedTime);
+
+        SpawnLocalProjectile(startPosition, shootDirection, passedTime);
     }
 
     void HandleAiming()
