@@ -1,26 +1,18 @@
 using FishNet.Managing;
+using FishNet.Managing.Scened;
 using FishNet.Transporting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class ConnectionManager : MonoBehaviour
 {
     [SerializeField] NetworkManager networkManager;
 
-    private void OnEnable()
-    {
-        networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
-    }
-
-    private void OnDisable()
-    {
-        networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
-    }
-
     public void StartHost()
     {
         StartServer();
         StartClient();
+
+        networkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
     }
 
     public void StartServer()
@@ -31,6 +23,8 @@ public class ConnectionManager : MonoBehaviour
     public void StartClient()
     { 
         networkManager.ClientManager.StartConnection();
+
+        networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
     }
 
     public void SetIpAddress(string text)
@@ -38,18 +32,26 @@ public class ConnectionManager : MonoBehaviour
         networkManager.TransportManager.Transport.SetClientAddress(text);
     }
 
-    private void OnClientConnectionState(ClientConnectionStateArgs args)
+    void OnServerConnectionState(ServerConnectionStateArgs args)
     {
-        switch (args.ConnectionState)
+        if (args.ConnectionState == LocalConnectionState.Started)
         {
-            case LocalConnectionState.Started:
-                //udpate connection state
-                SceneManager.LoadScene("GameScene");
-                break;
+            networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
 
-            case LocalConnectionState.Stopped:
-                Debug.Log("Failed to connect");
-                break;
+            SceneLoadData sceneLoadData = new SceneLoadData("GameScene");
+            sceneLoadData.ReplaceScenes = ReplaceOption.All;
+            networkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+        }
+    }
+
+    void OnClientConnectionState(ClientConnectionStateArgs args)
+    {
+        if (args.ConnectionState == LocalConnectionState.Started)
+        {
+            networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
+
+            // If conneting on a client unload the scene locally.
+            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync("MainMenuScene");
         }
     }
 }
