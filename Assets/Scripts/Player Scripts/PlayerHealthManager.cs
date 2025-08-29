@@ -39,6 +39,7 @@ public class PlayerHealthManager : NetworkBehaviour
 
     void Die()
     {
+        // Only ever runs on the server since TakeDamage() above can't be called by clients.
         Debug.Log(gameObject.name + " died");
     }
 }

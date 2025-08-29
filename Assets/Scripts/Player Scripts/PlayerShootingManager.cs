@@ -1,6 +1,4 @@
 using FishNet.Object;
-using System.Diagnostics;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlayerShootingManager : NetworkBehaviour
@@ -42,8 +40,13 @@ public class PlayerShootingManager : NetworkBehaviour
             Vector3 targetPoint = CameraManager.Instance.GetAimTargetPoint();
             Vector3 targetDirection = (targetPoint - projectileSpawn.position).normalized;
 
+            // Spawn local projectile for the player that is shooting
+            SpawnLocalProjectile(projectileSpawn.position, targetDirection, 0f);
+
             // Tell the server to spawn projectiles on other machines.
             SpawnServerProjectile(projectileSpawn.position, targetDirection, base.TimeManager.Tick);
+
+
 
             nextShootTime = Time.time + fireRate;
         }
@@ -52,8 +55,19 @@ public class PlayerShootingManager : NetworkBehaviour
     // Spawn projectile Locally
     void SpawnLocalProjectile(Vector3 startPosition, Vector3 shootDirection, float passedTime)
     {
-        GameObject localProjectile = Instantiate(projectilePrefab.gameObject, projectileSpawn.position, Quaternion.identity);
-        localProjectile.GetComponent<Projectile>().ShootProjectile(shootDirection, projectileSpeed, projectileDamage);
+        Vector3 adjustedPosition = startPosition + shootDirection * projectileSpeed * passedTime;
+
+        GameObject localProjectile = ProjectilePool.Instance.GetProjectile(gameObject);
+
+        Projectile projectile = localProjectile.GetComponent<Projectile>();
+        projectile.SetOwnerAndIgnoreCollisions(gameObject);
+
+        localProjectile.transform.position = adjustedPosition;
+        localProjectile.transform.rotation = Quaternion.LookRotation(shootDirection);
+
+        localProjectile.SetActive(true);
+
+        projectile.ShootProjectile(shootDirection, projectileSpeed, projectileDamage);
     }
 
     // Client sending code to run on the server
@@ -69,7 +83,7 @@ public class PlayerShootingManager : NetworkBehaviour
     }
 
     // Server sending code to run on clients
-    [ObserversRpc]
+    [ObserversRpc(ExcludeOwner = true)]
     void SpawnObserversProjectile(Vector3 startPosition, Vector3 shootDirection, uint tick)
     {
         float passedTime = (float)base.TimeManager.TimePassed(tick, false);
