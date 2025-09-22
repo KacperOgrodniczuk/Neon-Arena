@@ -6,6 +6,8 @@ public class PlayerManager : NetworkBehaviour
     [Header("Player Scripts")]
     public PlayerLocomotionManager locomotionManager { get; private set; }
     public PlayerAnimationManager animationManager { get; private set; }
+    public PlayerHealthManager healthManager { get; private set; }
+    public PlayerShootingManager shootingManager { get; private set; }
 
     [Header("Camera Follow Target")]
     public GameObject cameraFollowTarget;
@@ -29,6 +31,8 @@ public class PlayerManager : NetworkBehaviour
     {
         locomotionManager = GetComponent<PlayerLocomotionManager>();
         animationManager = GetComponent<PlayerAnimationManager>();
+        healthManager = GetComponent<PlayerHealthManager>();
+        shootingManager = GetComponent<PlayerShootingManager>();
     }
 
     private void Update()

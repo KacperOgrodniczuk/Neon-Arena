@@ -55,29 +55,21 @@ public class PlayerShootingManager : NetworkBehaviour
     // Spawn projectile Locally
     void SpawnLocalProjectile(Vector3 startPosition, Vector3 shootDirection, float passedTime)
     {
-        Vector3 adjustedPosition = startPosition + shootDirection * projectileSpeed * passedTime;
-
         GameObject localProjectile = ProjectilePool.Instance.GetProjectile(gameObject);
-
         Projectile projectile = localProjectile.GetComponent<Projectile>();
         projectile.SetOwnerAndIgnoreCollisions(gameObject);
 
-        localProjectile.transform.position = adjustedPosition;
+        localProjectile.transform.position = startPosition;
         localProjectile.transform.rotation = Quaternion.LookRotation(shootDirection);
-
         localProjectile.SetActive(true);
 
-        projectile.ShootProjectile(shootDirection, projectileSpeed, projectileDamage);
+        projectile.ShootProjectile(shootDirection, projectileSpeed, projectileDamage, passedTime);
     }
 
     // Client sending code to run on the server
     [ServerRpc]
     void SpawnServerProjectile(Vector3 startPosition, Vector3 shootDirection, uint tick)
     {
-        float passedTime = (float)base.TimeManager.TimePassed(tick, false);
-
-        passedTime = Mathf.Min(maxPassedTime / 2f, passedTime);
-
         // Tell other clients to spawn the projectil. 
         SpawnObserversProjectile(startPosition, shootDirection, tick);
     }
