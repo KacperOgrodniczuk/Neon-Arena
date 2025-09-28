@@ -6,7 +6,7 @@ public class PlayerAnimationManager : MonoBehaviour
 {
     public Animator animator { get; private set; }
 
-    float dampTime = 0.15f;
+    float animationDampTime = 0.15f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -16,7 +16,13 @@ public class PlayerAnimationManager : MonoBehaviour
 
     public void UpdateMovementParameters(float horizontalInput, float verticalInput)
     {
-        animator.SetFloat("HorizontalInput", horizontalInput, dampTime, Time.deltaTime);
-        animator.SetFloat("VerticalInput", verticalInput, dampTime, Time.deltaTime);
+        animator.SetFloat("HorizontalInput", horizontalInput, animationDampTime, Time.deltaTime);
+        animator.SetFloat("VerticalInput", verticalInput, animationDampTime, Time.deltaTime);
+    }
+
+    // Play Target Animation, using the name of the animation state as a parameter (Not the animation clip name)
+    public void PlayTargetAnimation(string animationStateName)
+    {
+        animator.CrossFade(animationStateName, animationDampTime);
     }
 }

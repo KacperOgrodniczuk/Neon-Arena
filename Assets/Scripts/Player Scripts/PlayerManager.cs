@@ -14,7 +14,6 @@ public class PlayerManager : NetworkBehaviour
 
     [Header("Flags")]
     public bool isAiming;
-    public bool isSprinting;
 
     public override void OnStartClient()
     {
@@ -49,5 +48,9 @@ public class PlayerManager : NetworkBehaviour
             //if not aiming pass one parameter since the player rotates in the direction they move in.
             animationManager.UpdateMovementParameters(0, locomotionManager.moveAmount);
         }
+
+        // Used to determine wether the player should play the falling animation or not.
+        animationManager.animator.SetFloat("InAirTimer", locomotionManager.inAirTimer);
+        animationManager.animator.SetBool("IsGrounded", locomotionManager.isGrounded);
     }
 }

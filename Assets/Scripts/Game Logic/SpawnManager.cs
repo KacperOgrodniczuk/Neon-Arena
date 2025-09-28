@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
+    // AI generated, need to rework this, not a fan of how it currently works.
     public static SpawnManager Instance { get; private set; }
 
     [Header("Spawn Settings")]
