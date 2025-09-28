@@ -273,7 +273,6 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 6134665511805451729}
   cameraFollowTarget: {fileID: 8709443052471894445}
   isAiming: 0
-  isSprinting: 0
 --- !u!114 &63614092601625945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -703,6 +702,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 315026963871887861, guid: 5590ab0a162acad4bac0a7dddd13a257, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 397af27f89b0182419d631b8b5733e53, type: 2}
     - target: {fileID: 455160886374548593, guid: 5590ab0a162acad4bac0a7dddd13a257, type: 3}
       propertyPath: m_Layer
       value: 7
