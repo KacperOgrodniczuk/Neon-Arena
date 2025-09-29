@@ -103,5 +103,15 @@ public class PlayerHealthManager : NetworkBehaviour
     {
         // Play flinch animation
         // Update any ui
+        // Play flash effect
+        if (IsOwner)
+        {
+            if (nextValue < previousValue)
+            {
+                OutlineFlashEffectManager.Instance.TriggerOutlineEffect(
+                    OutlineFlashEffectManager.Instance.colourPallete.TakeDamageColour, 
+                    OutlineFlashEffectManager.Instance.defaultFlashDuration);
+            }
+        }
     }
 }
