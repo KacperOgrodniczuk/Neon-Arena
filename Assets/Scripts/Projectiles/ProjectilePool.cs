@@ -27,13 +27,13 @@ public class ProjectilePool : MonoBehaviour
     void InitialisePool()
     {
         projectilePool = new ObjectPool<GameObject>(
-            createFunc: CreateProjectile,
-            actionOnGet: GetProjectileFromPool,
-            actionOnRelease: ReleaseProjectileToPool,
-            actionOnDestroy: DestroyProjectile,
-            collectionCheck: true,   //should be set to false in main build.
-            defaultCapacity: initialPoolSize,
-            maxSize: maxPoolSize
+            CreateProjectile,
+            GetProjectileFromPool,
+            ReleaseProjectileToPool,
+            DestroyProjectile,
+            false,
+            initialPoolSize,
+            maxPoolSize
             );
     }
 
@@ -46,6 +46,9 @@ public class ProjectilePool : MonoBehaviour
 
     void GetProjectileFromPool(GameObject projectile)
     {
+        Rigidbody rb = projectile.GetComponent<Rigidbody>();
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         // We set the projectiles as active in playershooting
         // to ensure that we set ignore collision owner before any collision detection
         // takes place.

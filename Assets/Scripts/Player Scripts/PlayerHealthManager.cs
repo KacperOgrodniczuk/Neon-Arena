@@ -1,5 +1,6 @@
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using FishNet.Connection;
 using System.Collections;
 using UnityEngine;
 
@@ -23,13 +24,15 @@ public class PlayerHealthManager : NetworkBehaviour
 
     // Damage is server validated and therefore should only be called on the server.
     [Server]
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, NetworkObject damageDealer)
     {
         if (isDead.Value) return;
 
         currentHealth.Value -= amount;
 
         currentHealth.Value = Mathf.Max(currentHealth.Value, 0);
+
+        ConfirmHitTargetRPC(damageDealer.Owner);
 
         if (currentHealth.Value <= 0f)
         {
@@ -58,6 +61,7 @@ public class PlayerHealthManager : NetworkBehaviour
         playerManager.shootingManager.enabled = false;
 
         // Play death effects
+        ParticleEffectManager.Instance.PlayEffect("PlayerDeath", transform.position, Quaternion.identity);
 
         // Hide the player's model and collider
         GetComponent<Collider>().enabled = false;
@@ -97,6 +101,12 @@ public class PlayerHealthManager : NetworkBehaviour
         // Show the player's model and collider
         GetComponent<Collider>().enabled = true;
         GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
+    }
+
+    [TargetRpc]
+    void ConfirmHitTargetRPC(NetworkConnection target)
+    {
+        
     }
 
     void OnHealthChange(float previousValue, float nextValue, bool asServer)

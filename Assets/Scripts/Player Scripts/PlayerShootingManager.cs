@@ -46,8 +46,6 @@ public class PlayerShootingManager : NetworkBehaviour
             // Tell the server to spawn projectiles on other machines.
             SpawnServerProjectile(projectileSpawn.position, targetDirection, base.TimeManager.Tick);
 
-
-
             nextShootTime = Time.time + fireRate;
         }
     }

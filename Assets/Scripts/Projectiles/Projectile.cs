@@ -73,12 +73,21 @@ public class Projectile : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         // Says it's obsolete, at the time of writing instance finder does not have "IsClientInitialized" or "IsServerInitialized.
+        // Collisions only happen on the server, client projectiles are cosmetic only.
+        // Pass the owner of the projectile to send a target rpc to confirm a hit using a hitmarker on client side.
         if (InstanceFinder.IsServer)
         {
-            collision.gameObject.GetComponent<PlayerHealthManager>()?.TakeDamage(damage);
+            owner.TryGetComponent(out NetworkObject ownerNetworkObject);
+            collision.gameObject.GetComponent<PlayerHealthManager>()?.TakeDamage(damage, ownerNetworkObject);
         }
 
         // play particle effect for collision
+        ContactPoint contactPoint = collision.contacts[0];
+        Vector3 hitPoint = contactPoint.point;
+        Vector3 hitNormal = contactPoint.normal;
+        Quaternion hitRotation = Quaternion.LookRotation(hitNormal);
+        ParticleEffectManager.Instance.PlayEffect("ProjectileHit", hitPoint, hitRotation);
+
         // play audio
         Pool.Release(gameObject);
     }
