@@ -107,6 +107,7 @@ public class PlayerHealthManager : NetworkBehaviour
     void ConfirmHitTargetRPC(NetworkConnection target)
     {
         // Call UI function to show a hit marker
+        HUDManager.Instance.TriggerHitMarkerEffect();
     }
 
     void OnHealthChange(float previousValue, float nextValue, bool asServer)
