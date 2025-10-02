@@ -106,7 +106,7 @@ public class PlayerHealthManager : NetworkBehaviour
     [TargetRpc]
     void ConfirmHitTargetRPC(NetworkConnection target)
     {
-        
+        // Call UI function to show a hit marker
     }
 
     void OnHealthChange(float previousValue, float nextValue, bool asServer)
