@@ -7,6 +7,7 @@ public class HUDManager : MonoBehaviour
 {
     public static HUDManager Instance { get; private set; }
 
+    [Header("Hit Marker")]
     public Image hitMarkerImage;
     public TMP_Text hitText;
     public float hitMarkerDuration = 0.2f;
@@ -14,6 +15,9 @@ public class HUDManager : MonoBehaviour
     private Coroutine hitMarkerCoroutine;
     private float defaultHitMarkerAlpha;
     private float defaultHitTextAlpha;
+
+    [Header("Timer")]
+    public TMP_Text timerText;
 
     private void Awake()
     {
@@ -27,6 +31,7 @@ public class HUDManager : MonoBehaviour
         }
     }
 
+    #region Hit Marker
     public void TriggerHitMarkerEffect()
     {
         if (hitMarkerCoroutine != null)
@@ -59,4 +64,17 @@ public class HUDManager : MonoBehaviour
 
         hitMarkerCoroutine = null;
     }
+
+    #endregion
+
+    #region Timer
+
+    public void UpdateTimer(float timeRemaining)
+    {
+        int minutes = Mathf.FloorToInt(timeRemaining / 60f);
+        int seconds = Mathf.FloorToInt(timeRemaining % 60f);
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    #endregion
 }

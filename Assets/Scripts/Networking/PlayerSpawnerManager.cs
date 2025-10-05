@@ -40,28 +40,19 @@ public class PlayerSpawnerManager : MonoBehaviour // Changed to MonoBehaviour
 
     void SceneManager_OnClientLoadedStartScenes(NetworkConnection connection, bool asServer)
     {
-        // This event fires on the server when a client finishes loading the initial scenes.
-        // The 'asServer' check ensures this only runs if we are the server (which we are, 
-        // but it's good practice for the NetworkManager.SceneManager event).
         if (asServer)
         {
-            // You might need a check to prevent running on the host connection if you 
-            // handle the host spawn separately, but for general use, this is where to spawn.
             SpawnPlayer(connection);
         }
     }
 
     private void SpawnPlayer(NetworkConnection connection)
     {
-        // Instantiate the player object using FishNet's pooling
         NetworkObject obj = InstanceFinder.NetworkManager.GetPooledInstantiated(playerPrefab, true);
 
         // Spawn it on the server, assign ownership to the new connection, and add it to the scene
         InstanceFinder.ServerManager.Spawn(obj, connection, gameObject.scene);
 
-        // This line is a common necessity if you aren't using the default PlayerSpawner
-        // and aren't using global scenes, to ensure the new connection observes the scene
-        // and its content (including the player and other players).
         InstanceFinder.SceneManager.AddConnectionToScene(connection, gameObject.scene);
     }
 }
