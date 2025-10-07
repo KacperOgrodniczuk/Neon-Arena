@@ -36,7 +36,7 @@ public class ConnectionManager : MonoBehaviour
         {
             networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
 
-            SceneLoadData sceneLoadData = new SceneLoadData("GameScene");
+            SceneLoadData sceneLoadData = new SceneLoadData("LobbyScene");
             sceneLoadData.ReplaceScenes = ReplaceOption.All;
             networkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
         }
