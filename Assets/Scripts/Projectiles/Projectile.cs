@@ -72,7 +72,6 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Says it's obsolete, at the time of writing instance finder does not have "IsClientInitialized" or "IsServerInitialized.
         // Collisions only happen on the server, client projectiles are cosmetic only.
         // Pass the owner of the projectile to send a target rpc to confirm a hit using a hitmarker on client side.
         if (InstanceFinder.IsServer)

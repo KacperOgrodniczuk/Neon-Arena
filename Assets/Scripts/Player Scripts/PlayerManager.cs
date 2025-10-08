@@ -8,12 +8,13 @@ public class PlayerManager : NetworkBehaviour
     public PlayerAnimationManager animationManager { get; private set; }
     public PlayerHealthManager healthManager { get; private set; }
     public PlayerShootingManager shootingManager { get; private set; }
+    public PlayerLobbyManager lobbyManager { get; private set; }
+    public PlayerStateManager stateManager { get; private set; }
+
+    NetworkObject playerNetworkObject;
 
     [Header("Camera Follow Target")]
     public GameObject cameraFollowTarget;
-
-    [Header("Flags")]
-    public bool isAiming;
 
     public override void OnStartClient()
     {
@@ -32,13 +33,19 @@ public class PlayerManager : NetworkBehaviour
         animationManager = GetComponent<PlayerAnimationManager>();
         healthManager = GetComponent<PlayerHealthManager>();
         shootingManager = GetComponent<PlayerShootingManager>();
+        lobbyManager = GetComponent<PlayerLobbyManager>();
+        stateManager = GetComponent<PlayerStateManager>();
+
+        playerNetworkObject = GetComponent<NetworkObject>();
+
+        playerNetworkObject.SetIsGlobal(true); // Make the player object persist across scene loads
     }
 
     private void Update()
     {
         if (!IsOwner) return;
 
-        if (isAiming)
+        if (shootingManager.isAiming)
         {
             //if aiming pass both parameters
             animationManager.UpdateMovementParameters(locomotionManager.horizontalInput, locomotionManager.verticalInput);

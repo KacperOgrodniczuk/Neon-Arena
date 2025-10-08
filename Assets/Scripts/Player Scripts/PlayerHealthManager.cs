@@ -10,8 +10,8 @@ public class PlayerHealthManager : NetworkBehaviour
 
     public float maxHealth = 100f;
 
-    public readonly SyncVar<float> currentHealth = new SyncVar<float>();
-    public readonly SyncVar<bool> isDead = new SyncVar<bool>(false);
+    public SyncVar<float> currentHealth = new SyncVar<float>();
+    public SyncVar<bool> isDead = new SyncVar<bool>(false);
 
     private void Awake()
     {
@@ -20,6 +20,7 @@ public class PlayerHealthManager : NetworkBehaviour
         currentHealth.Value = maxHealth;
 
         currentHealth.OnChange += OnHealthChange;
+
     }
 
     // Damage is server validated and therefore should only be called on the server.
@@ -46,7 +47,10 @@ public class PlayerHealthManager : NetworkBehaviour
         // Only ever runs on the server since TakeDamage() above can't be called by clients.
         isDead.Value = true;
 
-        DisablePlayerComponentsRPC();
+        // Set player state to dead in Player State Manager to disable scripts e.g. movement, shooting, etc.
+        playerManager.stateManager.playerState.Value = PlayerStateManager.PlayerState.Dead;
+
+        PlayDeathEffects();
 
         StartCoroutine(RespawnTimer());
 
@@ -54,12 +58,8 @@ public class PlayerHealthManager : NetworkBehaviour
     }
 
     [ObserversRpc]
-    void DisablePlayerComponentsRPC()
+    void PlayDeathEffects()
     {
-        // Prevent the player from moving or shooting when dead
-        playerManager.locomotionManager.enabled = false;
-        playerManager.shootingManager.enabled = false;
-
         // Play death effects
         ParticleEffectManager.Instance.PlayEffect("PlayerDeath", transform.position, Quaternion.identity);
 
@@ -81,10 +81,13 @@ public class PlayerHealthManager : NetworkBehaviour
         // Reset health
         currentHealth.Value = maxHealth;
         isDead.Value = false;
-        
+
         Transform spawnPoint = SpawnManager.Instance.GetBestSpawnPoint(this.NetworkObject);
 
         RespawnPlayerRPC(spawnPoint.position, spawnPoint.rotation);
+
+        // Set State To Alive in Player State Manager to enable scripts.
+        playerManager.stateManager.playerState.Value = PlayerStateManager.PlayerState.Alive;
     }
 
     [ObserversRpc]
@@ -93,10 +96,6 @@ public class PlayerHealthManager : NetworkBehaviour
         // Move player to a spawn point
         transform.position = position;
         transform.rotation = rotation;
-
-        // Re-enable player movement and shooting
-        playerManager.locomotionManager.enabled = true;
-        playerManager.shootingManager.enabled = true;
 
         // Show the player's model and collider
         GetComponent<Collider>().enabled = true;

@@ -74,7 +74,7 @@ public class PlayerLocomotionManager : NetworkBehaviour
         sprintInput = PlayerInputManager.Instance.sprintInput;
         jumpInput = PlayerInputManager.Instance.jumpInput;
 
-        isAiming = playerManager.isAiming;
+        isAiming = playerManager.shootingManager.isAiming;
 
         // Move amount mandates character speed and animations played, so we clamp it in a few ways.
         moveAmount = Mathf.Clamp01(Mathf.Abs(horizontalInput) + Mathf.Abs(verticalInput));

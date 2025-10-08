@@ -9,7 +9,7 @@ public class GameStateManager: NetworkBehaviour
     // 2. Only start the timer if there's at least 2 players connected.
     // 3. Finish the match when the timer reaches zero and decide what happens. e.g. game results screen, restart match, force quit if not enough players, etc.
 
-    private readonly SyncTimer timer = new SyncTimer();
+    private SyncTimer timer = new SyncTimer();
 
     [SerializeField]
     private float matchDuration = 300f;

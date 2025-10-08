@@ -8,6 +8,8 @@ public class PlayerShootingManager : NetworkBehaviour
     public Transform projectileSpawn;
     public GameObject projectilePrefab;
 
+    public bool isAiming { get; private set; }
+
     [Header("Attack Stats")]
     public float fireRate = 0.33f;
     public float projectileDamage = 10f;
@@ -32,7 +34,7 @@ public class PlayerShootingManager : NetworkBehaviour
     void HandleShooting()
     {
         // Can only shoot if aiming
-        if (!playerManager.isAiming)
+        if (!isAiming)
             return;
 
         if (PlayerInputManager.Instance.attackInput && Time.time >= nextShootTime)
@@ -84,6 +86,6 @@ public class PlayerShootingManager : NetworkBehaviour
 
     void HandleAiming()
     {
-        playerManager.isAiming = PlayerInputManager.Instance.aimInput;
+        isAiming = PlayerInputManager.Instance.aimInput;
     }
 }

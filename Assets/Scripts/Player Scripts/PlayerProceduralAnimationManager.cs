@@ -50,7 +50,7 @@ public class PlayerProceduralAnimationManager : NetworkBehaviour
     {
         Vector3 targetPoint = CameraManager.Instance.GetAimTargetPoint();
         targetDirection = (targetPoint - shoulderTransform.position).normalized;
-        targetIkWeight = playerManager.isAiming ? 1f : 0f;
+        targetIkWeight = playerManager.shootingManager.isAiming ? 1f : 0f;
     }
 
     void HandleRightArmAimIK(Vector3 aimDirection, float ikWeight)
