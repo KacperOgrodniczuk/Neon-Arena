@@ -10,8 +10,8 @@ public class PlayerHealthManager : NetworkBehaviour
 
     public float maxHealth = 100f;
 
-    public SyncVar<float> currentHealth = new SyncVar<float>();
-    public SyncVar<bool> isDead = new SyncVar<bool>(false);
+    public readonly SyncVar<float> currentHealth = new SyncVar<float>();
+    public readonly SyncVar<bool> isDead = new SyncVar<bool>(false);
 
     private void Awake()
     {

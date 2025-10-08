@@ -1,7 +1,8 @@
+using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
 
-public class PlayerStateManager : MonoBehaviour
+public class PlayerStateManager : NetworkBehaviour
 {
     public enum PlayerState
     {
@@ -12,7 +13,7 @@ public class PlayerStateManager : MonoBehaviour
 
     public PlayerManager playerManager { get; private set; }
 
-    public SyncVar<PlayerState> playerState = new SyncVar<PlayerState>(PlayerState.Lobby);
+    public readonly SyncVar<PlayerState> playerState = new SyncVar<PlayerState>(PlayerState.Lobby);
 
     private void Awake()
     {

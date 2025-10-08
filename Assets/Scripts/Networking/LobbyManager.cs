@@ -24,9 +24,8 @@ public class LobbyManager : NetworkBehaviour
         // Spawn player object for the connected client
         SpawnPlayer(connection);
 
-
-        // add a player card for each connected player on the lobby UI
-
+        // Update UI to show the new player in the lobby
+        LobbyUIManager.Instance.UpdatePlayerListUI(playerList);
     }
 
     private void SpawnPlayer(NetworkConnection connection)
@@ -38,6 +37,12 @@ public class LobbyManager : NetworkBehaviour
 
         // Ensure the connection is associated with the current scene
         InstanceFinder.SceneManager.AddConnectionToScene(connection, gameObject.scene);
+
+        // Set player state to lobby
+        obj.GetComponent<PlayerManager>().stateManager.playerState.Value = PlayerStateManager.PlayerState.Lobby;
+
+        // Add the new player to the player list
+        playerList.Add(obj.GetComponent<PlayerLobbyManager>());
     }
 
     // Handle UI cleanup if players disconnect
