@@ -33,6 +33,7 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.shootingManager.enabled = false;
                 playerManager.healthManager.enabled = false;
                 playerManager.lobbyManager.enabled = true;
+                playerManager.proceduralAnimationManager.enabled = false; // Disable procedural animations in lobby
                 break;
             case PlayerState.Alive:
                 playerManager.locomotionManager.enabled = true;
@@ -40,6 +41,7 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.shootingManager.enabled = true;
                 playerManager.healthManager.enabled = true;
                 playerManager.lobbyManager.enabled = false;
+                playerManager.proceduralAnimationManager.enabled = true;
                 break;
             case PlayerState.Dead:
                 playerManager.locomotionManager.enabled = false;
@@ -47,6 +49,7 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.shootingManager.enabled = false;
                 playerManager.healthManager.enabled = true; // Keep health manager enabled to allow respawning
                 playerManager.lobbyManager.enabled = false;
+                playerManager.proceduralAnimationManager.enabled = false;
                 break;
             default:
                 break;

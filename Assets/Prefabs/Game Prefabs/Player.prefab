@@ -1625,6 +1625,8 @@ GameObject:
   - component: {fileID: 4718093211435475888}
   - component: {fileID: 3120722982054352164}
   - component: {fileID: 329518842245488083}
+  - component: {fileID: 4555721563956497911}
+  - component: {fileID: 8933630731260859854}
   - component: {fileID: -1448894684582504100}
   m_Layer: 7
   m_Name: Player
@@ -1798,7 +1800,6 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 6134665511805451729}
   _networkObjectCache: {fileID: 6134665511805451729}
   cameraFollowTarget: {fileID: 8709443052471894445}
-  isAiming: 0
 --- !u!114 &63614092601625945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1892,6 +1893,36 @@ MonoBehaviour:
   shoulderTransform: {fileID: 6174594475007106175}
   rightArmIK: {fileID: 854148813587909333}
   handDistanceFromShoulder: 0.4
+--- !u!114 &4555721563956497911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7612859352416634925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c40e709b8d421214b98a6205238bed41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLobbyManager
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 6134665511805451729}
+  _networkObjectCache: {fileID: 0}
+--- !u!114 &8933630731260859854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7612859352416634925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd5d17208faade848bb874ceda7dbadb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStateManager
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 6134665511805451729}
+  _networkObjectCache: {fileID: 0}
 --- !u!114 &-1448894684582504100
 MonoBehaviour:
   m_ObjectHideFlags: 0

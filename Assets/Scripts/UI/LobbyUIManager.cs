@@ -33,6 +33,7 @@ public class LobbyUIManager : MonoBehaviour
         // Iterate the player list and create/update player cards
         for (int i = 0; i < playerList.Count; i++)
         {
+            Debug.Log(playerList[i].PlayerName);
             if (i < playerCards.Count)
             {
                 // Update existing card
@@ -43,7 +44,7 @@ public class LobbyUIManager : MonoBehaviour
             {
                 // Create new card
                 GameObject newCard = Instantiate(PlayerCardPrefab, PlayerListObject.transform);
-                TMP_Text playerNameText = newCard.GetComponent<TMP_Text>();
+                TMP_Text playerNameText = newCard.GetComponentInChildren<TMP_Text>();
                 playerNameText.text = playerList[i].PlayerName;
                 playerCards.Add(newCard);
             }

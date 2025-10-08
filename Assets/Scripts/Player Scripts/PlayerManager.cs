@@ -6,6 +6,7 @@ public class PlayerManager : NetworkBehaviour
     [Header("Player Scripts")]
     public PlayerLocomotionManager locomotionManager { get; private set; }
     public PlayerAnimationManager animationManager { get; private set; }
+    public PlayerProceduralAnimationManager proceduralAnimationManager { get; private set; }
     public PlayerHealthManager healthManager { get; private set; }
     public PlayerShootingManager shootingManager { get; private set; }
     public PlayerLobbyManager lobbyManager { get; private set; }
@@ -21,6 +22,7 @@ public class PlayerManager : NetworkBehaviour
         base.OnStartClient();
 
         // Only set the camera for the local player
+        // TODO: Needs to be moved to be called in the game scene, not the lobby scene.
         if (IsOwner)
         {
             CameraManager.Instance.followTarget = cameraFollowTarget;
@@ -31,6 +33,7 @@ public class PlayerManager : NetworkBehaviour
     {
         locomotionManager = GetComponent<PlayerLocomotionManager>();
         animationManager = GetComponent<PlayerAnimationManager>();
+        proceduralAnimationManager = GetComponent<PlayerProceduralAnimationManager>();
         healthManager = GetComponent<PlayerHealthManager>();
         shootingManager = GetComponent<PlayerShootingManager>();
         lobbyManager = GetComponent<PlayerLobbyManager>();

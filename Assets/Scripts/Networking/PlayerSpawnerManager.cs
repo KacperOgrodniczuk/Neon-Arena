@@ -1,40 +1,25 @@
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
-using FishNet.Transporting;
 using UnityEngine;
 
 public class PlayerSpawnerManager : MonoBehaviour // Changed to MonoBehaviour
 {
+    // TODO:
+    // This script will either need to be drastically changed or deleted, since lobby manager is dealing with a lot of this
+    // Will need to use proper game state manager to handle all scene transitions.
+
     [SerializeField] private NetworkObject playerPrefab;
 
     private void Awake()
     {
         // Subscribe to connection events when the script is created
-        InstanceFinder.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
-        if (InstanceFinder.SceneManager != null)
-        {
-            InstanceFinder.SceneManager.OnClientLoadedStartScenes += SceneManager_OnClientLoadedStartScenes;
-        }
+        InstanceFinder.SceneManager.OnClientLoadedStartScenes += SceneManager_OnClientLoadedStartScenes;
     }
 
     private void OnDestroy()
     {
-        // Unsubscribe when the script is destroyed
-        if (InstanceFinder.ServerManager != null)
-        {
-            InstanceFinder.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
-        }
-        if (InstanceFinder.SceneManager != null)
-        {
-            InstanceFinder.SceneManager.OnClientLoadedStartScenes -= SceneManager_OnClientLoadedStartScenes;
-        }
-    }
-
-    private void ServerManager_OnServerConnectionState(ServerConnectionStateArgs args)
-    {
-        // This is where you might handle logic when the server starts/stops, 
-        // but for spawning, we typically use OnClientLoadedStartScenes
+        InstanceFinder.SceneManager.OnClientLoadedStartScenes -= SceneManager_OnClientLoadedStartScenes;
     }
 
 
