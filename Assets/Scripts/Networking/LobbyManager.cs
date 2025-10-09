@@ -1,7 +1,7 @@
 using FishNet;
 using FishNet.Connection;
+
 using FishNet.Object;
-using FishNet.Transporting;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,55 +11,59 @@ public class LobbyManager : NetworkBehaviour
 
     private List<PlayerLobbyManager> playerList = new List<PlayerLobbyManager>();
 
-    public override void OnStartServer()
+    public List<PlayerLobbyManager> PlayerList => playerList;
+
+    public void Awake()
     {
-        base.OnStartServer();
+        InstanceFinder.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
 
-        if (IsServer)
+        InstanceFinder.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
+    }
+
+    private void OnRemoteConnectionState(NetworkConnection conn, FishNet.Transporting.RemoteConnectionStateArgs args)
+    {
+        // We only care about new connections starting
+        if (args.ConnectionState == FishNet.Transporting.RemoteConnectionState.Started)
         {
-            ServerManager.OnRemoteConnectionState += OnRemoteConnectionStateChange;
-
-            ClientManager.Connection.OnLoadedStartScenes += OnClientLoadedStartScenes;
+            // Note: We don't spawn immediately here anymore
+            // Instead, we wait for OnClientLoadedStartScenes
+            // Add connection to scene immediately so they can receive scene objects
+            SceneManager.AddConnectionToScene(conn, gameObject.scene);
         }
     }
 
-    void OnClientLoadedStartScenes(NetworkConnection connection, bool asServer)
+    private void OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
     {
-        ClientManager.Connection.OnLoadedStartScenes -= OnClientLoadedStartScenes;
+        if (!asServer)
+            return;
 
-        // Spawn player object for the connected client
-        SpawnPlayer(connection);
-    }
-
-    // Handle remote players connecting to the lobby
-    void OnRemoteConnectionStateChange(NetworkConnection connection, RemoteConnectionStateArgs args)
-    {
-        if (args.ConnectionState == RemoteConnectionState.Started)
-        {
-            // Spawn player object for the connected client
-            SpawnPlayer(connection);
-        }
+        // Spawn player only after the client has loaded the scene
+        SpawnPlayer(conn);
     }
 
     private void SpawnPlayer(NetworkConnection connection)
     {
-        NetworkObject obj = InstanceFinder.NetworkManager.GetPooledInstantiated(playerPrefab, true);
+        NetworkObject obj = NetworkManager.GetPooledInstantiated(playerPrefab, true);
         // Set player state to lobby
         obj.GetComponent<PlayerManager>().stateManager.playerState.Value = PlayerStateManager.PlayerState.Lobby;
 
         // Spawn it on the server, assign ownership to the new connection, and add it to the scene
-        InstanceFinder.ServerManager.Spawn(obj, connection, gameObject.scene);
+        ServerManager.Spawn(obj, connection, gameObject.scene);
 
         // Ensure the connection is associated with the current scene
-        InstanceFinder.SceneManager.AddConnectionToScene(connection, gameObject.scene);
+        SceneManager.AddConnectionToScene(connection, gameObject.scene);
 
         // Add the new player to the player list
         playerList.Add(obj.GetComponent<PlayerLobbyManager>());
 
-        // Update UI to show the new player in the lobby
-        LobbyUIManager.Instance.UpdatePlayerListUI(playerList);
+        //Subscribe to name change events
+        obj.GetComponent<PlayerLobbyManager>().SubscribeToNameChange(OnAnyPlayerNameChanged);
     }
 
+    private void OnAnyPlayerNameChanged(string oldValue, string newValue, bool asServer)
+    { 
+        LobbyUIManager.Instance.UpdatePlayerListUI(playerList);
+    }
 
     // Check wether all players are ready
     // Transition to the game scene when the host starts the game

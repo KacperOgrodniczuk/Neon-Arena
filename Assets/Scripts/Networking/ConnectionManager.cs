@@ -1,4 +1,5 @@
 using FishNet.Managing;
+using FishNet.Managing.Client;
 using FishNet.Managing.Scened;
 using FishNet.Transporting;
 using UnityEngine;
@@ -59,5 +60,6 @@ public class ConnectionManager : MonoBehaviour
 
         PlayerPrefs.SetString(PlayerNamePrefsKey, nameToSave);
         PlayerPrefs.Save();
+        Debug.Log($"Player name set to: {nameToSave} and saved to PlayerPrefs");
     }
 }

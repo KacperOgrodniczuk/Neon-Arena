@@ -25,7 +25,7 @@ public class PlayerManager : NetworkBehaviour
         // TODO: Needs to be moved to be called in the game scene, not the lobby scene.
         if (IsOwner)
         {
-            CameraManager.Instance.followTarget = cameraFollowTarget;
+            //CameraManager.Instance.followTarget = cameraFollowTarget;
         }
     }
 

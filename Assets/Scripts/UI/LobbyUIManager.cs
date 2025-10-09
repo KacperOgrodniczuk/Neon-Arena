@@ -33,7 +33,6 @@ public class LobbyUIManager : MonoBehaviour
         // Iterate the player list and create/update player cards
         for (int i = 0; i < playerList.Count; i++)
         {
-            Debug.Log(playerList[i].PlayerName);
             if (i < playerCards.Count)
             {
                 // Update existing card

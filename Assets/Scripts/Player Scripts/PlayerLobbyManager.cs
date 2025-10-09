@@ -12,9 +12,14 @@ public class PlayerLobbyManager : NetworkBehaviour
 
     //syncvar playerready
 
+    private LobbyManager lobbyManager;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        lobbyManager = FindAnyObjectByType<LobbyManager>();
+
         if (IsOwner)
         {
             // Load saved player name or generate a default one
@@ -22,5 +27,15 @@ public class PlayerLobbyManager : NetworkBehaviour
             SetPlayerName(savedName);
             Debug.Log($"Player name set to: {savedName} as read from PlayerPrefs");
         }
+    }
+
+    public void SubscribeToNameChange(SyncVar<string>.OnChanged handler)
+    {
+        _playerName.OnChange += handler;
+    }
+
+    public void UnsubscribeFromNameChange(SyncVar<string>.OnChanged handler)
+    {
+        _playerName.OnChange -= handler;
     }
 }
