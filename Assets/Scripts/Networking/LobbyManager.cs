@@ -1,35 +1,28 @@
 using FishNet;
 using FishNet.Connection;
-
 using FishNet.Object;
-using System.Collections.Generic;
+using FishNet.Object.Synchronizing;
+using System.Linq;
 using UnityEngine;
 
 public class LobbyManager : NetworkBehaviour
 {
     [SerializeField] private NetworkObject playerPrefab;
 
-    private List<PlayerLobbyManager> playerList = new List<PlayerLobbyManager>();
+    private readonly SyncList<PlayerLobbyManager> playerList = new SyncList<PlayerLobbyManager>();
 
-    public List<PlayerLobbyManager> PlayerList => playerList;
-
-    public void Awake()
+    void Awake()
     {
-        InstanceFinder.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
-
         InstanceFinder.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
+
+        playerList.OnChange += OnPlayerListChange;
     }
 
-    private void OnRemoteConnectionState(NetworkConnection conn, FishNet.Transporting.RemoteConnectionStateArgs args)
+    void OnDestroy()
     {
-        // We only care about new connections starting
-        if (args.ConnectionState == FishNet.Transporting.RemoteConnectionState.Started)
-        {
-            // Note: We don't spawn immediately here anymore
-            // Instead, we wait for OnClientLoadedStartScenes
-            // Add connection to scene immediately so they can receive scene objects
-            SceneManager.AddConnectionToScene(conn, gameObject.scene);
-        }
+        SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
+
+        playerList.OnChange -= OnPlayerListChange;
     }
 
     private void OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
@@ -43,6 +36,9 @@ public class LobbyManager : NetworkBehaviour
 
     private void SpawnPlayer(NetworkConnection connection)
     {
+        // Ensure the connection is associated with the current scene
+        SceneManager.AddConnectionToScene(connection, gameObject.scene);
+
         NetworkObject obj = NetworkManager.GetPooledInstantiated(playerPrefab, true);
         // Set player state to lobby
         obj.GetComponent<PlayerManager>().stateManager.playerState.Value = PlayerStateManager.PlayerState.Lobby;
@@ -50,21 +46,43 @@ public class LobbyManager : NetworkBehaviour
         // Spawn it on the server, assign ownership to the new connection, and add it to the scene
         ServerManager.Spawn(obj, connection, gameObject.scene);
 
-        // Ensure the connection is associated with the current scene
-        SceneManager.AddConnectionToScene(connection, gameObject.scene);
-
         // Add the new player to the player list
         playerList.Add(obj.GetComponent<PlayerLobbyManager>());
 
         //Subscribe to name change events
         obj.GetComponent<PlayerLobbyManager>().SubscribeToNameChange(OnAnyPlayerNameChanged);
+
+        //Send an observerRPC to inform clients they should also subscribe to the name change event
+        SubscriveToNameChangeObserverRpc(obj);
+    }
+
+    [ObserversRpc]
+    private void SubscriveToNameChangeObserverRpc(NetworkObject obj)
+    {
+        obj.GetComponent<PlayerLobbyManager>().SubscribeToNameChange(OnAnyPlayerNameChanged);
     }
 
     private void OnAnyPlayerNameChanged(string oldValue, string newValue, bool asServer)
     { 
-        LobbyUIManager.Instance.UpdatePlayerListUI(playerList);
+        LobbyUIManager.Instance.UpdatePlayerListUI(playerList.ToList());
+    }
+
+    private void OnPlayerListChange(SyncListOperation operation, int index, PlayerLobbyManager oldItem, PlayerLobbyManager newItem, bool asServer)
+    {
+        LobbyUIManager.Instance.UpdatePlayerListUI(playerList.ToList());
     }
 
     // Check wether all players are ready
+
     // Transition to the game scene when the host starts the game
+
+    // Handle the players or host disconnecting from the lobby.
+
+    public void QuitLobby()
+    {
+        if (IsServerInitialized)
+        {
+            ServerManager.StopConnection(true);
+        }
+    }
 }

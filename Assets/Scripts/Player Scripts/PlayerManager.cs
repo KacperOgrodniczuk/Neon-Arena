@@ -12,6 +12,10 @@ public class PlayerManager : NetworkBehaviour
     public PlayerLobbyManager lobbyManager { get; private set; }
     public PlayerStateManager stateManager { get; private set; }
 
+    [Header("Unity Components")]
+    public Collider playerCollider { get; private set; }
+    public SkinnedMeshRenderer playerSkinnedMeshRenderer { get; private set; }
+
     NetworkObject playerNetworkObject;
 
     [Header("Camera Follow Target")]
@@ -31,6 +35,7 @@ public class PlayerManager : NetworkBehaviour
 
     private void Awake()
     {
+        // Grab player scripts
         locomotionManager = GetComponent<PlayerLocomotionManager>();
         animationManager = GetComponent<PlayerAnimationManager>();
         proceduralAnimationManager = GetComponent<PlayerProceduralAnimationManager>();
@@ -39,9 +44,11 @@ public class PlayerManager : NetworkBehaviour
         lobbyManager = GetComponent<PlayerLobbyManager>();
         stateManager = GetComponent<PlayerStateManager>();
 
-        playerNetworkObject = GetComponent<NetworkObject>();
+        // Grab Unity Components
+        playerCollider = GetComponent<Collider>();
+        playerSkinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
 
-        playerNetworkObject.SetIsGlobal(true); // Make the player object persist across scene loads
+        playerNetworkObject = GetComponent<NetworkObject>();
     }
 
     private void Update()

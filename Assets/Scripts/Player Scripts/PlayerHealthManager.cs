@@ -62,10 +62,6 @@ public class PlayerHealthManager : NetworkBehaviour
     {
         // Play death effects
         ParticleEffectManager.Instance.PlayEffect("PlayerDeath", transform.position, Quaternion.identity);
-
-        // Hide the player's model and collider
-        GetComponent<Collider>().enabled = false;
-        GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
     }
 
     [Server]

@@ -4,6 +4,14 @@ using FishNet.Object.Synchronizing;
 
 public class GameStateManager: NetworkBehaviour
 {
+    public enum GameState
+    { 
+        Lobby,
+        Warmup,
+        InGame,
+        PostGame
+    }
+
     // TODO:
     // 1. Add game states.
     // 2. Only start the timer if there's at least 2 players connected.

@@ -34,7 +34,11 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.healthManager.enabled = false;
                 playerManager.lobbyManager.enabled = true;
                 playerManager.proceduralAnimationManager.enabled = false; // Disable procedural animations in lobby
+                
+                playerManager.playerCollider.enabled = false;
+                playerManager.playerSkinnedMeshRenderer.enabled = false;
                 break;
+
             case PlayerState.Alive:
                 playerManager.locomotionManager.enabled = true;
                 playerManager.animationManager.enabled = true;
@@ -42,7 +46,11 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.healthManager.enabled = true;
                 playerManager.lobbyManager.enabled = false;
                 playerManager.proceduralAnimationManager.enabled = true;
+
+                playerManager.playerCollider.enabled = true;
+                playerManager.playerSkinnedMeshRenderer.enabled = true;
                 break;
+
             case PlayerState.Dead:
                 playerManager.locomotionManager.enabled = false;
                 playerManager.animationManager.enabled = false;
@@ -50,9 +58,11 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.healthManager.enabled = true; // Keep health manager enabled to allow respawning
                 playerManager.lobbyManager.enabled = false;
                 playerManager.proceduralAnimationManager.enabled = false;
+                
+                playerManager.playerCollider.enabled = false;
+                playerManager.playerSkinnedMeshRenderer.enabled = false;
                 break;
-            default:
-                break;
+
         }
     }
 }
