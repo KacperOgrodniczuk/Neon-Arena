@@ -48,6 +48,16 @@ public class LobbyUIManager : MonoBehaviour
                 playerCards.Add(newCard);
             }
         }
+
+        // Iterate the player card list and delete unused cards.
+        for (int i = 0; i < playerCards.Count; i++)
+        {
+            if (i >= playerList.Count)
+            {
+                Destroy(playerCards[i]);
+                playerCards.RemoveAt(i);
+            }
+        }
     }
 
     public void UpdateTimer(float timeRemaining)

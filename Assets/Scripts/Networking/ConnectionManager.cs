@@ -1,3 +1,4 @@
+using FishNet;
 using FishNet.Managing;
 using FishNet.Managing.Client;
 using FishNet.Managing.Scened;
@@ -6,8 +7,6 @@ using UnityEngine;
 
 public class ConnectionManager : MonoBehaviour
 {
-    [SerializeField] NetworkManager networkManager;
-
     private const string PlayerNamePrefsKey = "PlayerName";
 
     public void StartHost()
@@ -15,33 +14,33 @@ public class ConnectionManager : MonoBehaviour
         StartServer();
         StartClient();
 
-        networkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
+        InstanceFinder.NetworkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
     }
 
     public void StartServer()
-    { 
-        networkManager.ServerManager.StartConnection();
+    {
+        InstanceFinder.ServerManager.StartConnection();
     }
 
     public void StartClient()
-    { 
-        networkManager.ClientManager.StartConnection();
+    {
+        InstanceFinder.ClientManager.StartConnection();
     }
 
     public void SetIpAddress(string text)
     {
-        networkManager.TransportManager.Transport.SetClientAddress(text);
+        InstanceFinder.TransportManager.Transport.SetClientAddress(text);
     }
 
     void OnServerConnectionState(ServerConnectionStateArgs args)
     {
         if (args.ConnectionState == LocalConnectionState.Started)
         {
-            networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
+            InstanceFinder.NetworkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
 
             SceneLoadData sceneLoadData = new SceneLoadData("LobbyScene");
             sceneLoadData.ReplaceScenes = ReplaceOption.All;
-            networkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+            InstanceFinder.NetworkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
         }
     }
 
