@@ -79,6 +79,7 @@ public class LobbyUIManager : MonoBehaviour
         if (InstanceFinder.IsServer)
         {
             InstanceFinder.ServerManager.StopConnection(true);
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenuScene");
         }
         // if client, stop the client connection
         else if (InstanceFinder.IsClient)

@@ -3219,6 +3219,10 @@ PrefabInstance:
       propertyPath: networkManager
       value: 
       objectReference: {fileID: 7123041790035228412}
+    - target: {fileID: 5406368319520600383, guid: 55121204a82be5c46a9e23383cef1ed0, type: 3}
+      propertyPath: lobbyManagerPrefab
+      value: 
+      objectReference: {fileID: 5721676798410519864, guid: 0873c939f067a954da79a0231379a729, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
