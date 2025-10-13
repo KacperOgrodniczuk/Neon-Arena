@@ -10,15 +10,9 @@ public class PlayerLobbyManager : NetworkBehaviour
 
     private const string PlayerNamePrefsKey = "PlayerName";
 
-    //syncvar playerready
-
-    private LobbyManager lobbyManager;
-
     public override void OnStartClient()
     {
         base.OnStartClient();
-
-        lobbyManager = FindAnyObjectByType<LobbyManager>();
 
         if (IsOwner)
         {

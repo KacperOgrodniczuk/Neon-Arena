@@ -1,6 +1,9 @@
-using UnityEngine;
-using TMPro;
+using FishNet;
+using FishNet.Managing.Client;
+using FishNet.Managing.Server;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 
 public class LobbyUIManager : MonoBehaviour
 {
@@ -67,4 +70,20 @@ public class LobbyUIManager : MonoBehaviour
         countDownTimer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
+    /// <summary>
+    /// Stops connections when quitting the lobby. Cleanup and transition logic is handled in OnClientConnectionState function subscvribed to an event with the same name.
+    /// </summary>
+    public void QuitLobby()
+    {
+        // If server, stop the server connection
+        if (InstanceFinder.IsServer)
+        {
+            InstanceFinder.ServerManager.StopConnection(true);
+        }
+        // if client, stop the client connection
+        else if (InstanceFinder.IsClient)
+        {
+            InstanceFinder.ClientManager.StopConnection();
+        }
+    }
 }

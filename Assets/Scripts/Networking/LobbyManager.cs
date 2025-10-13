@@ -7,33 +7,37 @@ using FishNet.Transporting;
 using UnityEngine;
 
 using System.Linq;
-using UnityEngine.SceneManagement;
-using NUnit.Framework.Constraints;
+using FishNet.Managing;
 
 public class LobbyManager : NetworkBehaviour
 {
+    private NetworkManager networkManager;
     [SerializeField] private NetworkObject playerPrefab;
 
     private readonly SyncList<PlayerLobbyManager> playerList = new SyncList<PlayerLobbyManager>();
 
-    void Awake()
+    public override void OnStartNetwork()
     {
-        InstanceFinder.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
-        
-        // Callback for client side cleanup e.g. loading the main menu scene since you've left the lobby.
-        InstanceFinder.ClientManager.OnClientConnectionState += OnClientConnectionState;
+        base.OnStartNetwork();
 
+        networkManager = InstanceFinder.NetworkManager;
+
+        networkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
+        // Callback for client side cleanup e.g. loading the main menu scene since you've left the lobby.
+        networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
         // Callback for server side cleanup e.g. unloading the global scene.
-        InstanceFinder.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+        networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
         
         playerList.OnChange += OnPlayerListChange;
     }
 
-    void OnDestroy()
+    public override void OnStopNetwork()
     {
-        InstanceFinder.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
-        InstanceFinder.ClientManager.OnClientConnectionState -= OnClientConnectionState;
-        InstanceFinder.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
+        base.OnStopNetwork();
+
+        networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
+        networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
+        networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
 
         playerList.OnChange -= OnPlayerListChange;
 
@@ -51,14 +55,14 @@ public class LobbyManager : NetworkBehaviour
     private void SpawnPlayer(NetworkConnection connection)
     {
         // Ensure the connection is associated with the current scene
-        InstanceFinder.SceneManager.AddConnectionToScene(connection, gameObject.scene);
+        networkManager.SceneManager.AddConnectionToScene(connection, gameObject.scene);
 
         NetworkObject obj = NetworkManager.GetPooledInstantiated(playerPrefab, true);
         // Set player state to lobby
         obj.GetComponent<PlayerManager>().stateManager.playerState.Value = PlayerStateManager.PlayerState.Lobby;
 
         // Spawn it on the server, assign ownership to the new connection, and add it to the scene
-        InstanceFinder.ServerManager.Spawn(obj, connection, gameObject.scene);
+        networkManager.ServerManager.Spawn(obj, connection, gameObject.scene);
 
         // Add the new player to the player list
         playerList.Add(obj.GetComponent<PlayerLobbyManager>());
@@ -118,21 +122,4 @@ public class LobbyManager : NetworkBehaviour
     // Check wether all players are ready
 
     // Transition to the game scene when the host starts the game
-
-    /// <summary>
-    /// Stops connections when quitting the lobby. Cleanup and transition logic is handled in OnClientConnectionState function subscvribed to an event with the same name.
-    /// </summary>
-    public void QuitLobby()
-    {
-        // If server, stop the server connection
-        if (IsServerInitialized)
-        {
-            ServerManager.StopConnection(true);
-        }
-        // if client, stop the client connection
-        else if (IsClientInitialized)
-        {
-            ClientManager.StopConnection();
-        }
-    }
 }

@@ -1,47 +1,60 @@
 using FishNet;
 using FishNet.Managing;
-using FishNet.Managing.Client;
 using FishNet.Managing.Scened;
+using FishNet.Object;
 using FishNet.Transporting;
 using UnityEngine;
 
 public class ConnectionManager : MonoBehaviour
 {
+    [SerializeField] private NetworkObject lobbyManagerPrefab;
+
+    private NetworkManager networkManager;
+
     private const string PlayerNamePrefsKey = "PlayerName";
+
+    public void Awake()
+    {
+        networkManager = InstanceFinder.NetworkManager;
+    }
 
     public void StartHost()
     {
+        networkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
+        
         StartServer();
         StartClient();
-
-        InstanceFinder.NetworkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
-    }
-
-    public void StartServer()
-    {
-        InstanceFinder.ServerManager.StartConnection();
-    }
-
-    public void StartClient()
-    {
-        InstanceFinder.ClientManager.StartConnection();
-    }
-
-    public void SetIpAddress(string text)
-    {
-        InstanceFinder.TransportManager.Transport.SetClientAddress(text);
     }
 
     void OnServerConnectionState(ServerConnectionStateArgs args)
     {
         if (args.ConnectionState == LocalConnectionState.Started)
         {
-            InstanceFinder.NetworkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
+            networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
+
+            // Spawn lobby manager before we switch scenes to prevent race conditions.
+            NetworkObject lobbyManagerObj = networkManager.GetPooledInstantiated(lobbyManagerPrefab, true);
+            networkManager.ServerManager.Spawn(lobbyManagerObj);
 
             SceneLoadData sceneLoadData = new SceneLoadData("LobbyScene");
             sceneLoadData.ReplaceScenes = ReplaceOption.All;
-            InstanceFinder.NetworkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+            networkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
         }
+    }
+
+    public void StartServer()
+    {
+        networkManager.ServerManager.StartConnection();
+    }
+
+    public void StartClient()
+    {
+        networkManager.ClientManager.StartConnection();
+    }
+
+    public void SetIpAddress(string text)
+    {
+        networkManager.TransportManager.Transport.SetClientAddress(text);
     }
 
     // TODO: Move to a dedicated PlayerPrefs manager class
@@ -60,5 +73,9 @@ public class ConnectionManager : MonoBehaviour
         PlayerPrefs.SetString(PlayerNamePrefsKey, nameToSave);
         PlayerPrefs.Save();
         Debug.Log($"Player name set to: {nameToSave} and saved to PlayerPrefs");
+    }
+    private void OnDestroy()
+    {
+        networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
     }
 }
