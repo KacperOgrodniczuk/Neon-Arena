@@ -11,6 +11,9 @@ public class LobbyUIManager : MonoBehaviour
 {
     public static LobbyUIManager Instance { get; private set; }
 
+    [Header("Buttons")]
+    public GameObject startGameButton;
+
     [Header("Player List")]
     public GameObject PlayerListObject; // Parent object to hold player cards
     public GameObject PlayerCardPrefab;
@@ -31,6 +34,14 @@ public class LobbyUIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void Start()
+    {
+        if (InstanceFinder.IsServer)
+            startGameButton.SetActive(true);
+        else if (InstanceFinder.IsClient)
+            startGameButton.SetActive(false);
     }
 
     public void UpdatePlayerListUI(List<PlayerLobbyManager> playerList)
@@ -74,9 +85,13 @@ public class LobbyUIManager : MonoBehaviour
 
     public void StartGameButton()
     {
-        SceneLoadData sceneLoadData = new SceneLoadData("GameScene");
-        sceneLoadData.ReplaceScenes = ReplaceOption.All;
-        InstanceFinder.NetworkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+        // Only do this as server
+        if (InstanceFinder.IsServer)
+        {
+            SceneLoadData sceneLoadData = new SceneLoadData("GameScene");
+            sceneLoadData.ReplaceScenes = ReplaceOption.All;
+            InstanceFinder.NetworkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+        }
     }
 
     public void QuitLobbyButton()

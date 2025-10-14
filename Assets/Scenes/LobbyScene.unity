@@ -1459,6 +1459,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2535319972344909756, guid: dcc33d371cfce9641b7391753aae1afe, type: 3}
+      propertyPath: startGameButton
+      value: 
+      objectReference: {fileID: 330232585}
+    - target: {fileID: 2535319972344909756, guid: dcc33d371cfce9641b7391753aae1afe, type: 3}
       propertyPath: PlayerListObject
       value: 
       objectReference: {fileID: 27445100}

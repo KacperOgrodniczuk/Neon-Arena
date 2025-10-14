@@ -54,7 +54,7 @@ public class SpawnManager : MonoBehaviour
 
         if (spawnPoints.Length == 0)
         {
-            Debug.LogError("No spawn points found! Make sure to tag spawn points with 'SpawnPoint' tag.");
+            Debug.LogError("No spawn points found! Make sure to tag spawn points with 'SpawnPoint' tag or assign manually through the inspector.");
         }
     }
 
@@ -123,11 +123,11 @@ public class SpawnManager : MonoBehaviour
     bool IsSpawnBlocked(Vector3 position)
     {
         // Check if there's something blocking the spawn point
-        Collider[] obstacles = Physics.OverlapSphere(position, 1f, playersMask);
-        return obstacles.Length > 0;
+        Collider[] nearbyPlayers = Physics.OverlapSphere(position, minDistanceBetweenPlayers, playersMask);
+        return nearbyPlayers.Length > 0;
     }
 
-    // Optional: Visual debugging in scene view
+    // Visualise spawn points in scene.
     void OnDrawGizmos()
     {
         if (spawnPoints == null) return;
