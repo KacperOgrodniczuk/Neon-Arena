@@ -21,12 +21,6 @@ public class LobbyManager : NetworkBehaviour
         base.OnStartNetwork();
 
         networkManager = InstanceFinder.NetworkManager;
-
-        networkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
-        // Callback for client side cleanup e.g. loading the main menu scene since you've left the lobby.
-        networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
-        // Callback for server side cleanup e.g. unloading the global scene.
-        networkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
         
         playerList.OnChange += OnPlayerListChange;
     }
@@ -35,24 +29,10 @@ public class LobbyManager : NetworkBehaviour
     {
         base.OnStopNetwork();
 
-        networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
-        networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
-        networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
-
         playerList.OnChange -= OnPlayerListChange;
-
     }
 
-    private void OnClientLoadedStartScenes(NetworkConnection conn, bool asServer)
-    {
-        if (!asServer)
-            return;
-
-        // Spawn player only after the client has loaded the scene
-        SpawnPlayer(conn);
-    }
-
-    private void SpawnPlayer(NetworkConnection connection)
+    public void SpawnPlayer(NetworkConnection connection)
     {
         // Ensure the connection is associated with the current scene
         networkManager.SceneManager.AddConnectionToScene(connection, gameObject.scene);
@@ -63,15 +43,24 @@ public class LobbyManager : NetworkBehaviour
 
         // Spawn it on the server, assign ownership to the new connection, and add it to the scene
         networkManager.ServerManager.Spawn(obj, connection, gameObject.scene);
+    }
 
+    public void AddPlayerToLobby(NetworkObject playerObj)
+    {
         // Add the new player to the player list
-        playerList.Add(obj.GetComponent<PlayerLobbyManager>());
-
+        playerList.Add(playerObj.GetComponent<PlayerLobbyManager>());
+        
         //Subscribe to name change events
-        obj.GetComponent<PlayerLobbyManager>().SubscribeToNameChange(OnAnyPlayerNameChanged);
+        playerObj.GetComponent<PlayerLobbyManager>().SubscribeToNameChange(OnAnyPlayerNameChanged);
 
         //Send an observerRPC to inform clients they should also subscribe to the name change event
-        SubscriveToNameChangeObserverRpc(obj);
+        SubscriveToNameChangeObserverRpc(playerObj);
+    }
+
+    public void RemovePlayerFromLobby(NetworkObject playerObj)
+    {
+        playerList.Remove(playerObj.GetComponent<PlayerLobbyManager>());
+        UnsubscribeFromNameChangeObserverRpc(playerObj);
     }
 
     [ObserversRpc]
@@ -88,38 +77,13 @@ public class LobbyManager : NetworkBehaviour
 
     private void OnAnyPlayerNameChanged(string oldValue, string newValue, bool asServer)
     { 
-        LobbyUIManager.Instance.UpdatePlayerListUI(playerList.ToList());
+        LobbyUIManager.Instance?.UpdatePlayerListUI(playerList.ToList());
     }
 
     private void OnPlayerListChange(SyncListOperation operation, int index, PlayerLobbyManager oldItem, PlayerLobbyManager newItem, bool asServer)
     {
-        LobbyUIManager.Instance.UpdatePlayerListUI(playerList.ToList());
+        LobbyUIManager.Instance?.UpdatePlayerListUI(playerList.ToList());
     }
-
-    private void OnClientConnectionState(ClientConnectionStateArgs args)
-    {
-        switch (args.ConnectionState)
-        {
-            case LocalConnectionState.Stopped:
-                UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenuScene");
-                break;
-        }
-    }
-
-    private void OnRemoteConnectionState(NetworkConnection connection, RemoteConnectionStateArgs args)
-    {
-        switch (args.ConnectionState)
-        {
-            case RemoteConnectionState.Stopped:
-                NetworkObject obj = connection.FirstObject;
-                playerList.Remove(obj.GetComponent<PlayerLobbyManager>());
-                UnsubscribeFromNameChangeObserverRpc(obj);
-
-                break;
-        }
-    }
-
-    // Check wether all players are ready
 
     // Transition to the game scene when the host starts the game
 }

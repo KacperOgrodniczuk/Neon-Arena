@@ -527,7 +527,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2048545913363251727}
         m_TargetAssemblyTypeName: LobbyUIManager, Assembly-CSharp
-        m_MethodName: QuitLobby
+        m_MethodName: QuitLobbyButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -588,7 +588,7 @@ GameObject:
   - component: {fileID: 330232588}
   - component: {fileID: 330232587}
   m_Layer: 5
-  m_Name: Ready Button
+  m_Name: Start Game Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -611,9 +611,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -125, y: -2}
-  m_SizeDelta: {x: 150, y: 60}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -25, y: -2}
+  m_SizeDelta: {x: 300, y: 60}
+  m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &330232587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -657,7 +657,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 330232588}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2048545913363251727}
+        m_TargetAssemblyTypeName: LobbyUIManager, Assembly-CSharp
+        m_MethodName: StartGameButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &330232588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1222,7 +1234,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Ready
+  m_text: Start Game
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3fca0d0adb2c157459f3fa5e27c378e6, type: 2}
   m_sharedMaterial: {fileID: 2271700743724524919, guid: 3fca0d0adb2c157459f3fa5e27c378e6, type: 2}

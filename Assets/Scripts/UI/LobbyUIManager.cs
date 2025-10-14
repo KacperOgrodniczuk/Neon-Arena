@@ -1,5 +1,7 @@
 using FishNet;
+using FishNet.Managing;
 using FishNet.Managing.Client;
+using FishNet.Managing.Scened;
 using FishNet.Managing.Server;
 using System.Collections.Generic;
 using TMPro;
@@ -70,21 +72,15 @@ public class LobbyUIManager : MonoBehaviour
         countDownTimer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-    /// <summary>
-    /// Stops connections when quitting the lobby. Cleanup and transition logic is handled in OnClientConnectionState function subscvribed to an event with the same name.
-    /// </summary>
-    public void QuitLobby()
+    public void StartGameButton()
     {
-        // If server, stop the server connection
-        if (InstanceFinder.IsServer)
-        {
-            InstanceFinder.ServerManager.StopConnection(true);
-            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenuScene");
-        }
-        // if client, stop the client connection
-        else if (InstanceFinder.IsClient)
-        {
-            InstanceFinder.ClientManager.StopConnection();
-        }
+        SceneLoadData sceneLoadData = new SceneLoadData("GameScene");
+        sceneLoadData.ReplaceScenes = ReplaceOption.All;
+        InstanceFinder.NetworkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+    }
+
+    public void QuitLobbyButton()
+    {
+        ConnectionManager.Instance.StopConnection();
     }
 }
