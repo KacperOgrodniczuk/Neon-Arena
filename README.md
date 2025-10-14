@@ -23,7 +23,7 @@ Sole developer, responsible for networking and core gameplay systems design and 
 
 ## How to Run
 - Clone the repository.
-- Open the project using Unity Editor [6000.2.5f1].
+- Open the project using Unity Editor [6000.2.6f2].
 - Run the game in the editor or build and run the game.
 
 ## Future Plans
