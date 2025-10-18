@@ -3,7 +3,15 @@ using UnityEngine;
 
 public class MainMenuUIManager : MonoBehaviour
 {
+    [Header("Canvas")]
+    public Canvas mainMenuCanvas;
+
     private const string PlayerNamePrefsKey = "PlayerName";
+
+    private void Awake()
+    {
+        mainMenuCanvas.worldCamera = CameraManager.Instance.cameraObject;
+    }
 
     public void HostButton()
     {

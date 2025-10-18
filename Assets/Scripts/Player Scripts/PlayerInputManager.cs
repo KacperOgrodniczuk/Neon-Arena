@@ -17,7 +17,7 @@ public class PlayerInputManager : MonoBehaviour
     public bool aimInput;
     public bool sprintInput;
     public bool jumpInput;
-
+    
     private void Awake()
     {
         if (Instance == null)
@@ -33,9 +33,7 @@ public class PlayerInputManager : MonoBehaviour
     
         inputActions = new InputSystem_Actions();
 
-        inputActions.Player.Enable();
-
-        //register callbacks
+        // Register callbacks for player actions (gameplay)
         inputActions.Player.Move.performed += context => movementInput = context.ReadValue<Vector2>();
         inputActions.Player.Look.performed += context => lookInput = context.ReadValue<Vector2>();
         inputActions.Player.Attack.performed += context => attackInput = context.ReadValueAsButton();
@@ -43,12 +41,44 @@ public class PlayerInputManager : MonoBehaviour
         inputActions.Player.Sprint.performed += context => sprintInput = context.ReadValueAsButton();
         inputActions.Player.Jump.performed += context => jumpInput = context.ReadValueAsButton();
 
-        LockCursor();
+        // TODO: Deal with this when I want controller/keyboard UI navigation support.
+        // Register callbacks for UI actions
+
+        // By default we start with UI.
+        DisableGameplayInput();
+        EnableUIInput();
+        UnlockCursor();
     }
 
     public void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public void EnableGameplayInput()
+    {
+        inputActions.Player.Enable();
+    }
+
+    public void DisableGameplayInput()
+    { 
+        inputActions.Player.Disable();
+    }
+
+    public void EnableUIInput()
+    { 
+        inputActions.UI.Enable();
+    }
+
+    public void DisableUIInput()
+    {
+        inputActions.UI.Disable();
     }
 }

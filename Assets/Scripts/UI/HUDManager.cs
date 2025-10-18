@@ -7,6 +7,9 @@ public class HUDManager : MonoBehaviour
 {
     public static HUDManager Instance { get; private set; }
 
+    [Header("Canvas")]
+    public Canvas HUDCanvas;
+
     [Header("Hit Marker")]
     public Image hitMarkerImage;
     public TMP_Text hitText;
@@ -29,6 +32,8 @@ public class HUDManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        HUDCanvas.worldCamera = CameraManager.Instance.cameraObject;
     }
 
     #region Hit Marker

@@ -22,6 +22,12 @@ public class PlayerStateManager : NetworkBehaviour
         playerState.OnChange += OnPlayerStateChange;
     }
 
+    [ServerRpc]
+    public void ChangeState(PlayerState newState)
+    { 
+        playerState.Value = newState;
+    }
+
     void OnPlayerStateChange(PlayerState oldValue, PlayerState newValue, bool asServer)
     {
 
@@ -31,8 +37,7 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.locomotionManager.enabled = false;
                 playerManager.animationManager.enabled = false;
                 playerManager.shootingManager.enabled = false;
-                playerManager.healthManager.enabled = false;
-                playerManager.lobbyManager.enabled = true;
+                playerManager.playerInfo.enabled = true;
                 playerManager.proceduralAnimationManager.enabled = false; // Disable procedural animations in lobby
                 
                 playerManager.playerCollider.enabled = false;
@@ -43,8 +48,7 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.locomotionManager.enabled = true;
                 playerManager.animationManager.enabled = true;
                 playerManager.shootingManager.enabled = true;
-                playerManager.healthManager.enabled = true;
-                playerManager.lobbyManager.enabled = false;
+                playerManager.playerInfo.enabled = false;
                 playerManager.proceduralAnimationManager.enabled = true;
 
                 playerManager.playerCollider.enabled = true;
@@ -55,8 +59,7 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.locomotionManager.enabled = false;
                 playerManager.animationManager.enabled = false;
                 playerManager.shootingManager.enabled = false;
-                playerManager.healthManager.enabled = true; // Keep health manager enabled to allow respawning
-                playerManager.lobbyManager.enabled = false;
+                playerManager.playerInfo.enabled = false;
                 playerManager.proceduralAnimationManager.enabled = false;
                 
                 playerManager.playerCollider.enabled = false;

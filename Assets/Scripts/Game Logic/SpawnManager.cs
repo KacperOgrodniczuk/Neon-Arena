@@ -25,10 +25,7 @@ public class SpawnManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
 
-    void Start()
-    {
         FindSpawnPoints();
     }
 
@@ -54,7 +51,7 @@ public class SpawnManager : MonoBehaviour
 
         if (spawnPoints.Length == 0)
         {
-            Debug.LogError("No spawn points found! Make sure to tag spawn points with 'SpawnPoint' tag or assign manually through the inspector.");
+            Debug.LogError("No spawn points found! Make sure to tag spawn points with 'SpawnPoint' tag.");
         }
     }
 

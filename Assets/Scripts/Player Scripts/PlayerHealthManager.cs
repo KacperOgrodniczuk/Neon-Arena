@@ -1,8 +1,11 @@
+using FishNet.Component.Transforming;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
-using FishNet.Connection;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEditor.FilePathAttribute;
 
 public class PlayerHealthManager : NetworkBehaviour
 {
@@ -20,7 +23,6 @@ public class PlayerHealthManager : NetworkBehaviour
         currentHealth.Value = maxHealth;
 
         currentHealth.OnChange += OnHealthChange;
-
     }
 
     // Damage is server validated and therefore should only be called on the server.
@@ -47,7 +49,7 @@ public class PlayerHealthManager : NetworkBehaviour
         // Only ever runs on the server since TakeDamage() above can't be called by clients.
         isDead.Value = true;
 
-        // Set player state to dead in Player State Manager to disable scripts e.g. movement, shooting, etc.
+        // Set player state to dead in Player State Manager to disable scripts e.g. movement, shooting, etc...
         playerManager.stateManager.playerState.Value = PlayerStateManager.PlayerState.Dead;
 
         PlayDeathEffects();
@@ -72,7 +74,7 @@ public class PlayerHealthManager : NetworkBehaviour
     }
 
     [Server]
-    void RespawnPlayer()
+    public void RespawnPlayer()
     {
         // Reset health
         currentHealth.Value = maxHealth;
@@ -80,22 +82,22 @@ public class PlayerHealthManager : NetworkBehaviour
 
         Transform spawnPoint = SpawnManager.Instance.GetBestSpawnPoint(this.NetworkObject);
 
-        RespawnPlayerRPC(spawnPoint.position, spawnPoint.rotation);
+        RespawnPlayerRPC(Owner, spawnPoint.position, spawnPoint.rotation);
 
         // Set State To Alive in Player State Manager to enable scripts.
         playerManager.stateManager.playerState.Value = PlayerStateManager.PlayerState.Alive;
     }
 
-    [ObserversRpc]
-    void RespawnPlayerRPC(Vector3 position, Quaternion rotation)
+    [TargetRpc]
+    void RespawnPlayerRPC(NetworkConnection target, Vector3 position, Quaternion rotation)
     {
         // Move player to a spawn point
         transform.position = position;
         transform.rotation = rotation;
 
-        // Show the player's model and collider
-        GetComponent<Collider>().enabled = true;
-        GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
+        GetComponent<NetworkTransform>().ForceSend();
+
+        playerManager.stateManager.ChangeState(PlayerStateManager.PlayerState.Alive);
     }
 
     [TargetRpc]

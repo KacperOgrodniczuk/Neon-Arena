@@ -34,11 +34,13 @@ public class CameraManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (Instance != this)
         {
             Destroy(gameObject);
         }
+
 
         cameraObject = GetComponentInChildren<Camera>();
         cameraObjectPosition = cameraObject.transform.localPosition;

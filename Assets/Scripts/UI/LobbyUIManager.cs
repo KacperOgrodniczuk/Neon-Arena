@@ -1,8 +1,5 @@
 using FishNet;
-using FishNet.Managing;
-using FishNet.Managing.Client;
 using FishNet.Managing.Scened;
-using FishNet.Managing.Server;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -10,6 +7,9 @@ using UnityEngine;
 public class LobbyUIManager : MonoBehaviour
 {
     public static LobbyUIManager Instance { get; private set; }
+
+    [Header("Canvas")]
+    public Canvas lobbyUICanvas;
 
     [Header("Buttons")]
     public GameObject startGameButton;
@@ -34,17 +34,23 @@ public class LobbyUIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        PlayerInputManager.Instance.UnlockCursor();
+        PlayerInputManager.Instance.DisableGameplayInput();
+        PlayerInputManager.Instance.EnableUIInput();
     }
 
     private void Start()
     {
+        lobbyUICanvas.worldCamera = CameraManager.Instance.cameraObject;
+
         if (InstanceFinder.IsServer)
             startGameButton.SetActive(true);
         else if (InstanceFinder.IsClient)
             startGameButton.SetActive(false);
     }
 
-    public void UpdatePlayerListUI(List<PlayerLobbyManager> playerList)
+    public void UpdatePlayerListUI(List<PlayerInfo> playerList)
     {
         // Iterate the player list and create/update player cards
         for (int i = 0; i < playerList.Count; i++)

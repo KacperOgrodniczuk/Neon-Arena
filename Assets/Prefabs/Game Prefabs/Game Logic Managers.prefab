@@ -91,6 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb1761569015dd04f881074ed82f7c9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HUDManager
+  HUDCanvas: {fileID: 0}
   hitMarkerImage: {fileID: 0}
   hitText: {fileID: 0}
   hitMarkerDuration: 0.2

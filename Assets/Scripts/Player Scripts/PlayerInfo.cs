@@ -2,13 +2,21 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
 
-public class PlayerLobbyManager : NetworkBehaviour
+public class PlayerInfo : NetworkBehaviour
 {
+    public PlayerManager playerManager;
+
     private readonly SyncVar<string> _playerName = new SyncVar<string>("Player");
     [ServerRpc] private void SetPlayerName(string playerName) => _playerName.Value = playerName;
+
     public string PlayerName => _playerName.Value;
 
     private const string PlayerNamePrefsKey = "PlayerName";
+
+    private void Awake()
+    {
+        playerManager = GetComponent<PlayerManager>();
+    }
 
     public override void OnStartClient()
     {
