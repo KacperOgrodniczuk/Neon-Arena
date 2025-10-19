@@ -83,19 +83,23 @@ public class PlayerHealthManager : NetworkBehaviour
         Transform spawnPoint = SpawnManager.Instance.GetBestSpawnPoint(this.NetworkObject);
 
         RespawnPlayerRPC(Owner, spawnPoint.position, spawnPoint.rotation);
-
-        // Set State To Alive in Player State Manager to enable scripts.
-        playerManager.stateManager.playerState.Value = PlayerStateManager.PlayerState.Alive;
     }
 
     [TargetRpc]
     void RespawnPlayerRPC(NetworkConnection target, Vector3 position, Quaternion rotation)
     {
+        GetComponent<NetworkTransform>().Teleport();
+
         // Move player to a spawn point
         transform.position = position;
         transform.rotation = rotation;
 
-        GetComponent<NetworkTransform>().ForceSend();
+        StartCoroutine(DelayStateChange());
+    }
+
+    IEnumerator DelayStateChange()
+    {
+        yield return new WaitForSeconds(0.33f);
 
         playerManager.stateManager.ChangeState(PlayerStateManager.PlayerState.Alive);
     }

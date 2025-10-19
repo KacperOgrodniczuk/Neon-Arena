@@ -61,14 +61,14 @@ public class LobbyManager : NetworkBehaviour
 
     public void AddPlayerToLobby(NetworkObject playerObj)
     {
-        // Add the new player to the player list
-        playerList.Add(playerObj.GetComponent<PlayerInfo>());
-        
+        //Send an observerRPC to inform clients they should also subscribe to the name change event
+        SubscriveToNameChangeObserverRpc(playerObj);
+
         //Subscribe to name change events
         playerObj.GetComponent<PlayerInfo>().SubscribeToNameChange(OnAnyPlayerNameChanged);
 
-        //Send an observerRPC to inform clients they should also subscribe to the name change event
-        SubscriveToNameChangeObserverRpc(playerObj);
+        // Add the new player to the player list
+        playerList.Add(playerObj.GetComponent<PlayerInfo>());
     }
 
     public void RemovePlayerFromLobby(NetworkObject playerObj)

@@ -22,6 +22,18 @@ public class ProjectilePool : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // Weird workaround to prevent ghost instances from appearing.
+        UnityEngine.SceneManagement.Scene currentScene = gameObject.scene;
+
+        if (!currentScene.name.Contains("GameScene"))
+        {
+            Debug.LogWarning($"[PoolManager] Self-destructing. Running in wrong scene: {currentScene.name}");
+
+            // Destroy this phantom instance immediately.
+            Destroy(this.gameObject);
+            return;
+        }
     }
 
     void InitialisePool()

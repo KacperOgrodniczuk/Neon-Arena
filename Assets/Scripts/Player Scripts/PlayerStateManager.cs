@@ -39,7 +39,8 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.shootingManager.enabled = false;
                 playerManager.playerInfo.enabled = true;
                 playerManager.proceduralAnimationManager.enabled = false; // Disable procedural animations in lobby
-                
+                playerManager.healthManager.enabled = false;
+
                 playerManager.playerCollider.enabled = false;
                 playerManager.playerSkinnedMeshRenderer.enabled = false;
                 break;
@@ -50,6 +51,7 @@ public class PlayerStateManager : NetworkBehaviour
                 playerManager.shootingManager.enabled = true;
                 playerManager.playerInfo.enabled = false;
                 playerManager.proceduralAnimationManager.enabled = true;
+                playerManager.healthManager.enabled = true;
 
                 playerManager.playerCollider.enabled = true;
                 playerManager.playerSkinnedMeshRenderer.enabled = true;

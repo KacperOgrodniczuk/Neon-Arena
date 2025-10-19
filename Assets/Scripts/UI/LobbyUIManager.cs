@@ -1,6 +1,7 @@
 using FishNet;
 using FishNet.Managing.Scened;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -48,15 +49,21 @@ public class LobbyUIManager : MonoBehaviour
             startGameButton.SetActive(true);
         else if (InstanceFinder.IsClient)
             startGameButton.SetActive(false);
+
+        TransitionManager.Instance.FadeOut();
     }
 
     public void UpdatePlayerListUI(List<PlayerInfo> playerList)
     {
+
         // Iterate the player list and create/update player cards
         for (int i = 0; i < playerList.Count; i++)
         {
             if (i < playerCards.Count)
             {
+                if (playerCards[i] == null)
+                    return;
+
                 // Update existing card
                 TMP_Text playerNameText = playerCards[i].GetComponentInChildren<TMP_Text>();
                 playerNameText.text = playerList[i].PlayerName;

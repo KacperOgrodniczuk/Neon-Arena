@@ -1,7 +1,6 @@
 using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
-using FishNet.Managing.Scened;
 using FishNet.Object;
 using FishNet.Transporting;
 using UnityEngine;
@@ -39,7 +38,7 @@ public class ConnectionManager : MonoBehaviour
     public void StartHost()
     {
         networkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
-        
+
         StartServer();
         StartClient();
     }
@@ -50,14 +49,14 @@ public class ConnectionManager : MonoBehaviour
         {
             networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
 
+            TransitionManager.Instance.FadeIn();
+
             // Spawn lobby manager before we switch scenes to prevent race conditions.
             NetworkObject lobbyManagerObj = networkManager.GetPooledInstantiated(lobbyManagerPrefab, true);
             networkManager.ServerManager.Spawn(lobbyManagerObj);
             lobbyManager = lobbyManagerObj.GetComponent<LobbyManager>();
 
-            SceneLoadData sceneLoadData = new SceneLoadData("LobbyScene");
-            sceneLoadData.ReplaceScenes = ReplaceOption.All;
-            networkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+            StartCoroutine(TransitionManager.Instance.DelayedOnlineSceneLoad("LobbyScene"));
         }
     }
 
