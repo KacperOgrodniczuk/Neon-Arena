@@ -45,7 +45,7 @@ public class LobbyManager : NetworkBehaviour
     public void SpawnPlayer(NetworkConnection connection)
     {
         // Ensure the connection is associated with the current scene
-        networkManager.SceneManager.AddConnectionToScene(connection, gameObject.scene);
+        //networkManager.SceneManager.AddConnectionToScene(connection, gameObject.scene);
 
         NetworkObject obj = NetworkManager.GetPooledInstantiated(playerPrefab, true);
 
@@ -54,6 +54,7 @@ public class LobbyManager : NetworkBehaviour
 
         // Spawn it on the server, assign ownership to the new connection, and add it to the scene
         networkManager.ServerManager.Spawn(obj, connection, gameObject.scene);
+        Debug.Log("new object assigned to connection " + connection);
     }
 
     public void AddPlayerToLobby(NetworkObject playerObj)

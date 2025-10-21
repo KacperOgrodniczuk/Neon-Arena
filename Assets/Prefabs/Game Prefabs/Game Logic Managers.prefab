@@ -96,6 +96,9 @@ MonoBehaviour:
   hitText: {fileID: 0}
   hitMarkerDuration: 0.2
   timerText: {fileID: 0}
+  leaderBoardUI: {fileID: 0}
+  playerList: {fileID: 0}
+  playerLeaderboardCardPrefab: {fileID: 0}
 --- !u!1 &3069546572165981851
 GameObject:
   m_ObjectHideFlags: 0

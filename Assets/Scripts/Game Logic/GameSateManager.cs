@@ -7,14 +7,22 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class GameSateManager : NetworkBehaviour
+public class GameStateManager : NetworkBehaviour
 {
+    public enum GameState
+    {
+        InGame,
+        PostGame
+    }
+
     // In game timer
     private readonly SyncTimer timer = new SyncTimer();
 
     [SerializeField]
     private float matchDuration = 300f;
     private float leaderBoardShowcaseDuration = 10f;
+
+    public static GameState gameState;
 
     // Only the server should set the timer and spawn all the players in. 
     public override void OnStartServer()
@@ -32,6 +40,8 @@ public class GameSateManager : NetworkBehaviour
 
             timer.StartTimer(matchDuration);
         }
+
+        gameState = GameState.InGame;
     }
 
     public override void OnStartClient()
@@ -43,12 +53,8 @@ public class GameSateManager : NetworkBehaviour
 
     private void Update()
     {
-        if (IsServerInitialized)
-        {
-            timer.Update();
-        }
-
-        UpdateHudTimer(timer.Remaining);
+        timer.Update();
+        HUDManager.Instance.UpdateTimer(timer.Remaining);
 
         if (timer.Remaining <= 0)
         {
@@ -61,6 +67,12 @@ public class GameSateManager : NetworkBehaviour
         PlayerInputManager.Instance.EnableUIInput();
         PlayerInputManager.Instance.DisableGameplayInput();
 
+        // Show leaderboard with all the kills.
+        HUDManager.Instance.UpdateLeaderBoard();
+        HUDManager.Instance.ShowLeaderBoard();
+
+        gameState = GameState.PostGame;
+
         if (IsServerInitialized)
         {
             StartCoroutine(EndGameSequence());
@@ -68,10 +80,7 @@ public class GameSateManager : NetworkBehaviour
     }
 
     private IEnumerator EndGameSequence()
-    { 
-        // Show leaderboard with all the kills.
-
-
+    {
         yield return new WaitForSeconds(leaderBoardShowcaseDuration);
         
         LobbyManager.Instance.FadeInOnAllClients();
@@ -86,10 +95,5 @@ public class GameSateManager : NetworkBehaviour
         SceneLoadData sceneLoadData = new SceneLoadData("LobbyScene");
         sceneLoadData.ReplaceScenes = ReplaceOption.All;
         InstanceFinder.NetworkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
-    }
-
-    void UpdateHudTimer(float timeRemainingValue)
-    {
-        HUDManager.Instance.UpdateTimer(timeRemainingValue);
     }
 }

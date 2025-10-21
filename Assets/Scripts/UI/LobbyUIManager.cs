@@ -125,10 +125,9 @@ public class LobbyUIManager : MonoBehaviour
             case SyncListOperation.Add:
                 newItem.playerName.OnChange += OnPlayerNameChange;
                 break;
-            case SyncListOperation.RemoveAt:
-                newItem.playerName.OnChange -= OnPlayerNameChange;
-                break;
         }
+
+        UpdatePlayerListUI(LobbyManager.Instance.playerList.ToList());
     }
 
     void OnPlayerNameChange(string previousName, string newName, bool asServer)

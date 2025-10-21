@@ -4,8 +4,6 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEditor.FilePathAttribute;
 
 public class PlayerHealthManager : NetworkBehaviour
 {
@@ -39,12 +37,12 @@ public class PlayerHealthManager : NetworkBehaviour
 
         if (currentHealth.Value <= 0f)
         {
-            Die();
+            Die(damageDealer);
         }
     }
 
     [Server]
-    void Die()
+    void Die(NetworkObject killer)
     {
         // Only ever runs on the server since TakeDamage() above can't be called by clients.
         isDead.Value = true;
@@ -57,6 +55,7 @@ public class PlayerHealthManager : NetworkBehaviour
         StartCoroutine(RespawnTimer());
 
         //Track kills for scoring
+        killer.GetComponent<PlayerInfo>().AddKill();
     }
 
     [ObserversRpc]
@@ -93,8 +92,10 @@ public class PlayerHealthManager : NetworkBehaviour
         // Move player to a spawn point
         transform.position = position;
         transform.rotation = rotation;
-
-        StartCoroutine(DelayStateChange());
+        
+        // Prevent player state change if we're post game looking at the leaderboard.
+        if(GameStateManager.gameState == GameStateManager.GameState.InGame)
+            StartCoroutine(DelayStateChange());
     }
 
     IEnumerator DelayStateChange()

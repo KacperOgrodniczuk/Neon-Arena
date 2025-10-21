@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!20 &50907436 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 6676704546957000995, guid: 924ec965d5914aa489219734159ad090, type: 3}
+  m_PrefabInstance: {fileID: 258492038}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &93718510
 GameObject:
   m_ObjectHideFlags: 0
@@ -1847,7 +1852,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1013888718}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5858988125734601107}
+        m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
+        m_MethodName: QuitButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1013888718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2302,7 +2319,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 50907436}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1

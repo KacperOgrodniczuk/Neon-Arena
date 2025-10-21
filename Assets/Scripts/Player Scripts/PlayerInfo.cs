@@ -11,6 +11,9 @@ public class PlayerInfo : NetworkBehaviour
 
     private const string PlayerNamePrefsKey = "PlayerName";
 
+    private readonly SyncVar<int> _currentKills = new SyncVar<int>(0);
+    public int currentKills => _currentKills.Value;
+
     private void Awake()
     {
         playerManager = GetComponent<PlayerManager>();
@@ -26,5 +29,11 @@ public class PlayerInfo : NetworkBehaviour
             string savedName = PlayerPrefs.GetString(PlayerNamePrefsKey, $"Guest_{Random.Range(100, 999)}");
             SetPlayerName(savedName);
         }
+    }
+
+    [Server]
+    public void AddKill()
+    {
+        _currentKills.Value++;
     }
 }

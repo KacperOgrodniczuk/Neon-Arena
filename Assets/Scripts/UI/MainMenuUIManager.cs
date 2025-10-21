@@ -14,9 +14,13 @@ public class MainMenuUIManager : MonoBehaviour
 
     private void Awake()
     {
-        mainMenuCanvas.worldCamera = CameraManager.Instance.cameraObject;
-
         startConnectionDelay = TransitionManager.Instance.fadeDuration + 0.1f;
+    }
+
+    private void Start()
+    {
+        if (mainMenuCanvas.worldCamera == null)
+            mainMenuCanvas.worldCamera = CameraManager.Instance.cameraObject;
     }
 
     public void HostButton()
@@ -67,5 +71,10 @@ public class MainMenuUIManager : MonoBehaviour
         PlayerPrefs.SetString(PlayerNamePrefsKey, nameToSave);
         PlayerPrefs.Save();
         Debug.Log($"Player name set to: {nameToSave} and saved to PlayerPrefs");
+    }
+
+    public void QuitButton()
+    { 
+        Application.Quit();
     }
 }

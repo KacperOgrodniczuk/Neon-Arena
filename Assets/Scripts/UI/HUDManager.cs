@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
+using System.Linq;
 
 public class HUDManager : MonoBehaviour
 {
@@ -21,6 +23,13 @@ public class HUDManager : MonoBehaviour
 
     [Header("Timer")]
     public TMP_Text timerText;
+
+    [Header("Leaderboard")]
+    public GameObject leaderBoardUI;
+    public GameObject playerList;
+    public GameObject playerLeaderboardCardPrefab;
+    private List<GameObject> playerLeaderboardCards = new List<GameObject>();
+    private List<PlayerInfo> sortedPlayerInfos;
 
     private void Awake()
     {
@@ -46,9 +55,9 @@ public class HUDManager : MonoBehaviour
         }
 
         HUDCanvas.worldCamera = CameraManager.Instance.cameraObject;
+        leaderBoardUI.SetActive(false);
     }
 
-    #region Hit Marker
     public void TriggerHitMarkerEffect()
     {
         if (hitMarkerCoroutine != null)
@@ -82,10 +91,6 @@ public class HUDManager : MonoBehaviour
         hitMarkerCoroutine = null;
     }
 
-    #endregion
-
-    #region Timer
-
     public void UpdateTimer(float timeRemaining)
     {
         int minutes = Mathf.FloorToInt(timeRemaining / 60f);
@@ -93,5 +98,42 @@ public class HUDManager : MonoBehaviour
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-    #endregion
+    public void UpdateLeaderBoard()
+    {
+        List<PlayerInfo> playerInfos = LobbyManager.Instance.playerList.ToList();
+
+        sortedPlayerInfos = playerInfos.OrderByDescending(p => p.currentKills).ToList();
+
+        for (int i = 0; i < playerInfos.Count; i++)
+        {
+            if (i < playerLeaderboardCards.Count)
+            { 
+                PlayerLeaderboardCard playerCard = playerLeaderboardCards[i].GetComponentInChildren<PlayerLeaderboardCard>();
+                playerCard.playerNameText.text = sortedPlayerInfos[i].playerName.Value;
+                playerCard.killCountText.text = "Kills: " + sortedPlayerInfos[i].currentKills;
+            }
+            else
+            {
+                GameObject newCard = Instantiate(playerLeaderboardCardPrefab, playerList.transform);
+                PlayerLeaderboardCard playerCard = newCard.GetComponentInChildren<PlayerLeaderboardCard>();
+                playerCard.playerNameText.text = sortedPlayerInfos[i].playerName.Value;
+                playerCard.killCountText.text = "Kills: " + sortedPlayerInfos[i].currentKills;
+                playerLeaderboardCards.Add(newCard);
+            }
+        }
+
+        for (int i = 0; i < playerLeaderboardCards.Count; i++)
+        {
+            if (i >= sortedPlayerInfos.Count)
+            {
+                Destroy(playerLeaderboardCards[i]);
+                playerLeaderboardCards.RemoveAt(i);
+            }
+        }
+    }
+
+    public void ShowLeaderBoard()
+    {
+        leaderBoardUI.SetActive(true);
+    }
 }
