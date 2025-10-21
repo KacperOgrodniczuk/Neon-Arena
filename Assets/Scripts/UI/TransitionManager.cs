@@ -9,6 +9,7 @@ public class TransitionManager : MonoBehaviour
 {
     public static TransitionManager Instance;
 
+    public Canvas loadingCanvas;
     public Image blackoutPanel;
     public TMP_Text loadingText;
 
@@ -19,36 +20,23 @@ public class TransitionManager : MonoBehaviour
         if (Instance == null)
             Instance = this;
         else if (Instance != this)
+        {
+            Destroy(loadingCanvas.gameObject);
             Destroy(gameObject);
+        }
 
         DontDestroyOnLoad(gameObject);
-        DontDestroyOnLoad(blackoutPanel.canvas.gameObject);
+        DontDestroyOnLoad(loadingCanvas.gameObject);
 
-        // Ensure the loading canvas always appears on top. 
-        blackoutPanel.canvas.sortingOrder = 999;
-    }
+        // Ensure the loading canvas is disabled and set to 0 alpha tranpsarency on load.
+        // Ensure the loading canvas is always rendered on top of everything else.
+        loadingCanvas.gameObject.SetActive(false);
+        loadingCanvas.sortingOrder = 999;
+        Color startingColour = blackoutPanel.color;
+        startingColour.a = 0;
+        blackoutPanel.color = startingColour;
 
-    private void Start()
-    {
-        //Load the main menu scene by default.
-        FadeIn();
-        AsyncOperation asyncLoad = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("MainMenuScene", UnityEngine.SceneManagement.LoadSceneMode.Additive);
-        asyncLoad.allowSceneActivation = false;
-
-        StartCoroutine(WaitForSceneLoadAndActivate(asyncLoad));
-    }
-
-
-    /// <summary>
-    /// Used for delayed loading of online scenes
-    /// </summary>
-    public IEnumerator DelayedOnlineSceneLoad(string newScene)
-    {
-        yield return new WaitForSeconds(fadeDuration + 0.2f);
-
-        SceneLoadData sceneLoadData = new SceneLoadData(newScene);
-        sceneLoadData.ReplaceScenes = ReplaceOption.All;
-        InstanceFinder.NetworkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
+        InstanceFinder.NetworkManager.SceneManager.OnLoadEnd += OnSceneLoadEnd;
     }
 
     /// <summary>
@@ -72,7 +60,7 @@ public class TransitionManager : MonoBehaviour
 
     public void FadeIn()
     {
-        blackoutPanel.gameObject.SetActive(true);
+        loadingCanvas.gameObject.SetActive(true);
         StartCoroutine(Fade(1f));
     }
 
@@ -110,6 +98,17 @@ public class TransitionManager : MonoBehaviour
         loadingText.color = loadingTextColour;
 
         if (targetAlpha == 0f)
-            blackoutPanel.gameObject.SetActive(false);
+            loadingCanvas.gameObject.SetActive(false);
+    }
+
+    // Used so that whenever fishnet finishes loading a scene it automatically fades out. 
+    public void OnSceneLoadEnd(SceneLoadEndEventArgs args)
+    {
+        FadeOut();
+    }
+
+    private void OnDestroy()
+    {
+        InstanceFinder.NetworkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
     }
 }

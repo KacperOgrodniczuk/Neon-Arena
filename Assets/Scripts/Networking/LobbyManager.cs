@@ -3,11 +3,12 @@ using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using FishNet.Transporting;
-
 using UnityEngine;
-
 using System.Linq;
 using FishNet.Managing;
+using System;
+using FishNet.Managing.Scened;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// The term lobby is used to represent the list of players within the given game. This lobby class keeps track of all players within the lobby and game scene screen, and persists accross both of the scenes.
@@ -34,15 +35,11 @@ public class LobbyManager : NetworkBehaviour
         base.OnStartNetwork();
 
         networkManager = InstanceFinder.NetworkManager;
-        
-        playerList.OnChange += OnPlayerListChange;
     }
 
     public override void OnStopNetwork()
     {
         base.OnStopNetwork();
-
-        playerList.OnChange -= OnPlayerListChange;
     }
 
     public void SpawnPlayer(NetworkConnection connection)
@@ -61,12 +58,6 @@ public class LobbyManager : NetworkBehaviour
 
     public void AddPlayerToLobby(NetworkObject playerObj)
     {
-        //Send an observerRPC to inform clients they should also subscribe to the name change event
-        SubscriveToNameChangeObserverRpc(playerObj);
-
-        //Subscribe to name change events
-        playerObj.GetComponent<PlayerInfo>().SubscribeToNameChange(OnAnyPlayerNameChanged);
-
         // Add the new player to the player list
         playerList.Add(playerObj.GetComponent<PlayerInfo>());
     }
@@ -74,28 +65,11 @@ public class LobbyManager : NetworkBehaviour
     public void RemovePlayerFromLobby(NetworkObject playerObj)
     {
         playerList.Remove(playerObj.GetComponent<PlayerInfo>());
-        UnsubscribeFromNameChangeObserverRpc(playerObj);
     }
 
     [ObserversRpc]
-    private void SubscriveToNameChangeObserverRpc(NetworkObject obj)
+    public void FadeInOnAllClients()
     {
-        obj.GetComponent<PlayerInfo>().SubscribeToNameChange(OnAnyPlayerNameChanged);
-    }
-
-    [ObserversRpc]
-    private void UnsubscribeFromNameChangeObserverRpc(NetworkObject obj)
-    {
-        obj.GetComponent<PlayerInfo>().UnsubscribeFromNameChange(OnAnyPlayerNameChanged);
-    }
-
-    private void OnAnyPlayerNameChanged(string oldValue, string newValue, bool asServer)
-    { 
-        LobbyUIManager.Instance?.UpdatePlayerListUI(playerList.ToList());
-    }
-
-    private void OnPlayerListChange(SyncListOperation operation, int index, PlayerInfo oldItem, PlayerInfo newItem, bool asServer)
-    {
-        LobbyUIManager.Instance?.UpdatePlayerListUI(playerList.ToList());
+        TransitionManager.Instance.FadeIn();
     }
 }

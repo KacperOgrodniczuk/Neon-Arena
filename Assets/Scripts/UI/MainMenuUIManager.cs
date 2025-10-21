@@ -1,4 +1,5 @@
 using FishNet;
+using System.Collections;
 using UnityEngine;
 
 public class MainMenuUIManager : MonoBehaviour
@@ -8,18 +9,41 @@ public class MainMenuUIManager : MonoBehaviour
 
     private const string PlayerNamePrefsKey = "PlayerName";
 
+    // Delay used for starting connections after loading screen fade in completes.
+    float startConnectionDelay = 0f;
+
     private void Awake()
     {
         mainMenuCanvas.worldCamera = CameraManager.Instance.cameraObject;
+
+        startConnectionDelay = TransitionManager.Instance.fadeDuration + 0.1f;
     }
 
     public void HostButton()
     {
-        ConnectionManager.Instance.StartHost();
+        TransitionManager.Instance.FadeIn();
+
+        StartCoroutine(StartHostAfterDelay(startConnectionDelay));
     }
 
     public void JoinButton()
     {
+        TransitionManager.Instance.FadeIn();
+
+        StartCoroutine(StartClientAfterDelay(startConnectionDelay));
+    }
+
+    private IEnumerator StartHostAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        ConnectionManager.Instance.StartHost();
+    }
+
+    private IEnumerator StartClientAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
         ConnectionManager.Instance.StartClient();
     }
 

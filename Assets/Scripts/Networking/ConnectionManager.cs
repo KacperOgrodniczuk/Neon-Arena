@@ -1,6 +1,7 @@
 using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
+using FishNet.Managing.Scened;
 using FishNet.Object;
 using FishNet.Transporting;
 using UnityEngine;
@@ -31,7 +32,7 @@ public class ConnectionManager : MonoBehaviour
         // Callback for client side e.g. loading the main menu scene since you've left the lobby.
         networkManager.ClientManager.OnClientConnectionState += OnClientConnectionState;
 
-        // Callback for spawning in player objects for clients (remote and host) based on scene load.
+        // Callback for what should happen when scenes are loaded e.g. spawning in player objects for clients (remote and host).
         networkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoadedStartScenes;
     }
 
@@ -49,17 +50,17 @@ public class ConnectionManager : MonoBehaviour
         {
             networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
 
-            TransitionManager.Instance.FadeIn();
-
             // Spawn lobby manager before we switch scenes to prevent race conditions.
             NetworkObject lobbyManagerObj = networkManager.GetPooledInstantiated(lobbyManagerPrefab, true);
             networkManager.ServerManager.Spawn(lobbyManagerObj);
             lobbyManager = lobbyManagerObj.GetComponent<LobbyManager>();
 
-            StartCoroutine(TransitionManager.Instance.DelayedOnlineSceneLoad("LobbyScene"));
+            SceneLoadData sceneLoadData = new SceneLoadData("LobbyScene");
+            sceneLoadData.ReplaceScenes = ReplaceOption.All;
+            InstanceFinder.NetworkManager.SceneManager.LoadGlobalScenes(sceneLoadData);
         }
     }
-
+    
     public void StartServer()
     {
         networkManager.ServerManager.StartConnection();
@@ -126,9 +127,10 @@ public class ConnectionManager : MonoBehaviour
     private void OnDestroy()
     {
         networkManager.ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
-        networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
-        networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
-
         networkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
+
+        networkManager.ClientManager.OnClientConnectionState -= OnClientConnectionState;
+        
+        networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoadedStartScenes;
     }
 }
