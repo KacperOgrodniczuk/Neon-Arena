@@ -51,7 +51,7 @@ public class LobbyUIManager : MonoBehaviour
     private IEnumerator SubscribeToPlayerListChangeAfterDelay()
     {
         // Arbitrary delay due to losing my sanity.
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(1.5f);
 
         LobbyManager.Instance.playerList.OnChange += OnPlayerListChange;
         UpdatePlayerListUI(LobbyManager.Instance.playerList.ToList());

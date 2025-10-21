@@ -13,7 +13,9 @@ public class TransitionManager : MonoBehaviour
     public Image blackoutPanel;
     public TMP_Text loadingText;
 
-    public float fadeDuration = 1f;
+    [SerializeField]
+    private float _fadeDuration = 1f;
+    public float fadeDuration { get; private set; }
 
     private void Awake()
     {
@@ -27,6 +29,8 @@ public class TransitionManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
         DontDestroyOnLoad(loadingCanvas.gameObject);
+
+        fadeDuration = _fadeDuration;
 
         // Ensure the loading canvas is disabled and set to 0 alpha tranpsarency on load.
         // Ensure the loading canvas is always rendered on top of everything else.
@@ -109,6 +113,7 @@ public class TransitionManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        InstanceFinder.NetworkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
+        if(InstanceFinder.NetworkManager != null)
+            InstanceFinder.NetworkManager.SceneManager.OnLoadEnd -= OnSceneLoadEnd;
     }
 }

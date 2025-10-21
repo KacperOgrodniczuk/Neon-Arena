@@ -22,6 +22,7 @@ public class PlayerStateManager : NetworkBehaviour
         playerState.OnChange += OnPlayerStateChange;
     }
 
+    // This allows clients to inform the server about state changes, e.g. when the player is alive again.
     [ServerRpc]
     public void ChangeState(PlayerState newState)
     { 

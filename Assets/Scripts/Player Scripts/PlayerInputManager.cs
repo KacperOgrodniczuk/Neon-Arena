@@ -70,6 +70,13 @@ public class PlayerInputManager : MonoBehaviour
     public void DisableGameplayInput()
     { 
         inputActions.Player.Disable();
+        // We also reset all the input to prevent movement and camera scripts from behaving weird. 
+        movementInput = Vector2.zero;
+        lookInput = Vector2.zero;
+        attackInput = false;
+        aimInput = false;
+        sprintInput = false;
+        jumpInput = false;
     }
 
     public void EnableUIInput()
