@@ -1,19 +1,29 @@
 using FishNet.Object;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    // AI generated, need to rework this, not a fan of how it currently works.
     public static SpawnManager Instance { get; private set; }
 
     [Header("Spawn Settings")]
     [SerializeField] private Transform[] spawnPoints;
-    [SerializeField] private float minDistanceBetweenPlayers = 5f;
-    [SerializeField] private float spawnProtectionTime = 3f;
+    [SerializeField] private float playerCheckDistance = 10f;
     [SerializeField] private LayerMask playersMask = -1;
 
-    private Dictionary<Transform, float> spawnPointLastUsed = new();
+    private struct ScoredSpawnPoint
+    {
+        public Transform spawnPoint;
+        public float score;
+
+        public ScoredSpawnPoint(Transform t)
+        { 
+            spawnPoint = t;
+            score = 0;
+        }
+    }
 
     void Awake()
     {
@@ -29,24 +39,15 @@ public class SpawnManager : MonoBehaviour
         FindSpawnPoints();
     }
 
-    void FindSpawnPoints()
+    public void FindSpawnPoints()
     {
-        if (spawnPoints == null || spawnPoints.Length == 0)
-        {
-            // Auto-find spawn points in scene
-            GameObject[] spawnObjects = GameObject.FindGameObjectsWithTag("SpawnPoint");
-            spawnPoints = new Transform[spawnObjects.Length];
+        // Auto-find spawn points in scene
+        GameObject[] spawnObjects = GameObject.FindGameObjectsWithTag("SpawnPoint");
+        spawnPoints = new Transform[spawnObjects.Length];
 
-            for (int i = 0; i < spawnObjects.Length; i++)
-            {
-                spawnPoints[i] = spawnObjects[i].transform;
-            }
-        }
-
-        // Initialize timing dictionary
-        foreach (Transform spawn in spawnPoints)
+        for (int i = 0; i < spawnObjects.Length; i++)
         {
-            spawnPointLastUsed[spawn] = -spawnProtectionTime; // Allow immediate use
+            spawnPoints[i] = spawnObjects[i].transform;
         }
 
         if (spawnPoints.Length == 0)
@@ -55,73 +56,70 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    public Transform GetBestSpawnPoint(NetworkObject excludePlayer = null)
+    public Transform GetLeastBusySpawnPoint(NetworkObject excludePlayer = null)
     {
         if (spawnPoints.Length == 0)
         {
             Debug.LogWarning("No spawn points available! Using world origin.");
         }
 
-        Transform bestSpawn = null;
-        float bestScore = float.MinValue;
+        List<ScoredSpawnPoint> scoredSpawnPoints = new List<ScoredSpawnPoint>();
 
         foreach (Transform spawnPoint in spawnPoints)
         {
-            float score = EvaluateSpawnPoint(spawnPoint, excludePlayer);
-
-            if (score > bestScore)
-            {
-                bestScore = score;
-                bestSpawn = spawnPoint;
-            }
+            scoredSpawnPoints.Add(CalculateSpawnScore(spawnPoint));
         }
 
-        // Mark this spawn as recently used
-        if (bestSpawn != null)
+        // Find the lowest score in the list.
+        float minScore = scoredSpawnPoints.Min(scoredSpawnPoint => scoredSpawnPoint.score);
+
+        // Lowest being the best since these are the least occupied. Where score values are similar to the lowest value add them to a list together.
+        List<ScoredSpawnPoint> lowestScoredSpawnPoints = scoredSpawnPoints.Where(scoredSpawnPoint => Mathf.Approximately(scoredSpawnPoint.score, minScore)).ToList();
+
+        Transform bestSpawnPoint;
+
+        // Return random best spawn point, if there is only one with the lowest score then it will be returned either way.
+        if (lowestScoredSpawnPoints.Count > 0)
         {
-            spawnPointLastUsed[bestSpawn] = Time.time;
+            int randomIndex = Random.Range(0, lowestScoredSpawnPoints.Count);
+            bestSpawnPoint = lowestScoredSpawnPoints[randomIndex].spawnPoint;
+
+            return bestSpawnPoint;
         }
 
-        return bestSpawn != null ? bestSpawn : spawnPoints[0];
+        // This should never run since the list would have to be empty for this.
+
+        return lowestScoredSpawnPoints[0].spawnPoint; ;
     }
 
-    float EvaluateSpawnPoint(Transform spawnPoint, NetworkObject excludePlayer)
-    {
-        float score = 100f; // Base score
-
-        // Check if spawn point is blocked by another player.
-        if (IsSpawnBlocked(spawnPoint.position))
-        {
-            return float.MinValue; // Never use blocked spawns
-        }
-
-        // Penalty for recently used spawn points
-        float timeSinceUsed = Time.time - spawnPointLastUsed[spawnPoint];
-        if (timeSinceUsed < spawnProtectionTime)
-        {
-            score -= 50f * (spawnProtectionTime - timeSinceUsed);
-        }
-
-        // Penalty for nearby players
-        Collider[] nearbyPlayers = Physics.OverlapSphere(spawnPoint.position, minDistanceBetweenPlayers);
-        foreach (Collider col in nearbyPlayers)
-        {
-            NetworkObject netObj = col.GetComponent<NetworkObject>();
-            if (netObj != null && netObj != excludePlayer && netObj.GetComponent<PlayerHealthManager>() != null)
-            {
-                float distance = Vector3.Distance(spawnPoint.position, col.transform.position);
-                score -= 30f * (minDistanceBetweenPlayers - distance) / minDistanceBetweenPlayers;
-            }
-        }
-
-        return score;
-    }
-
-    bool IsSpawnBlocked(Vector3 position)
+    
+    // Use a score system to evaluate how "busy" the spawn point is with other nearby players
+    ScoredSpawnPoint CalculateSpawnScore(Transform spawnPoint)
     {
         // Check if there's something blocking the spawn point
-        Collider[] nearbyPlayers = Physics.OverlapSphere(position, minDistanceBetweenPlayers, playersMask);
-        return nearbyPlayers.Length > 0;
+        Collider[] nearbyPlayers = Physics.OverlapSphere(spawnPoint.position, playerCheckDistance, playersMask);
+
+        float score = 0;
+
+        if (nearbyPlayers.Length > 0)
+        {
+            foreach (Collider c in nearbyPlayers)
+            { 
+                float distance = Vector3.Distance(spawnPoint.position, c.transform.position);
+                float proximityScore = playerCheckDistance - distance;
+
+                if (distance > 0)
+                {
+                    score += proximityScore;
+                }
+            }
+        }
+
+        ScoredSpawnPoint scoredSpawnPoint = new ScoredSpawnPoint();
+        scoredSpawnPoint.spawnPoint = spawnPoint;
+        scoredSpawnPoint.score = score;
+
+        return scoredSpawnPoint;
     }
 
     // Visualise spawn points in scene.
@@ -135,8 +133,13 @@ public class SpawnManager : MonoBehaviour
 
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(spawn.position, 1f);
+
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(spawn.position, minDistanceBetweenPlayers);
+            Gizmos.DrawWireSphere(spawn.position, playerCheckDistance);
+
+            Vector3 forwardPoint = spawn.position + spawn.transform.forward;
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(spawn.position, forwardPoint);
         }
     }
 }
