@@ -79,7 +79,7 @@ public class PlayerHealthManager : NetworkBehaviour
         currentHealth.Value = maxHealth;
         isDead.Value = false;
 
-        Transform spawnPoint = SpawnManager.Instance.GetRandomSpawnPoint(this.NetworkObject);
+        Transform spawnPoint = SpawnManager.Instance.GetLeastBusySpawnPoint(this.NetworkObject);
 
         RespawnPlayerRPC(Owner, spawnPoint.position, spawnPoint.rotation);
     }

@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnManager
   spawnPoints: []
-  minDistanceBetweenPlayers: 5
+  playerCheckDistance: 10
   playersMask:
     serializedVersion: 2
     m_Bits: 128
